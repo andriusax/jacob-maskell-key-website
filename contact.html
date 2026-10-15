@@ -7,7 +7,10 @@ permalink: /contact/
   <h1 class="hero-display">Contact</h1>
 </section>
 
-<form class="contact-form" action="https://formsubmit.co/jacob@example.com" method="POST">
+<form class="contact-form" action="https://formsubmit.co/a.dereviancenko@gmail.com" method="POST">
+  <input type="hidden" name="_next" value="{{ '/thank-you/' | absolute_url }}">
+  <input type="hidden" name="_subject" value="New message from jacobmaskell-key.com">
+  <input type="hidden" name="_captcha" value="false">
   <div class="form-field">
     <label for="email">Email</label>
     <input type="email" id="email" name="email" placeholder="your@email.com" required>
@@ -20,5 +23,8 @@ permalink: /contact/
     <label for="message">Message</label>
     <textarea id="message" name="message" placeholder="Message" required></textarea>
   </div>
-  <button type="submit" class="pill-btn">Send</button>
+  <button type="submit" class="send-btn" aria-label="Send message">
+    <span class="send-btn__icon"><i class="fa-solid fa-paper-plane"></i></span>
+    <span class="send-btn__label">Send</span>
+  </button>
 </form>

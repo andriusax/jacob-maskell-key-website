@@ -1,6 +1,9 @@
 title: Jacob Maskell-Key
 description: Composer, producer and member of Nihiloxica.
 baseurl: ""
+# TODO: set this to the real production URL once the site is deployed
+# (e.g. "https://andriusax.github.io" or a custom domain) — it's needed
+# for the contact form's post-submit redirect (see contact.html _next field)
 url: ""
 
 markdown: kramdown
