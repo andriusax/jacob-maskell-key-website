@@ -1,10 +1,10 @@
 title: Jacob Maskell-Key
 description: Composer, producer and member of Nihiloxica.
+# baseurl is left blank so local dev (`jekyll serve`) still serves at the
+# root (http://127.0.0.1:4000/) — the GitHub Actions workflow passes the
+# correct project-page baseurl at build time instead (see .github/workflows/pages.yml)
 baseurl: ""
-# TODO: set this to the real production URL once the site is deployed
-# (e.g. "https://andriusax.github.io" or a custom domain) — it's needed
-# for the contact form's post-submit redirect (see contact.html _next field)
-url: ""
+url: "https://andriusax.github.io"
 
 markdown: kramdown
 permalink: pretty
