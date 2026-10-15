@@ -1,0 +1,14 @@
+---
+layout: default
+title: Remixes
+permalink: /remixes/
+---
+<section class="page-header">
+  <h1 class="hero-display">Remixes</h1>
+</section>
+
+<section class="card-grid">
+  {% for remix in site.data.remixes %}
+    {% include album-card.html band=remix.band album=remix.album year=remix.year image=remix.image link=remix.link %}
+  {% endfor %}
+</section>

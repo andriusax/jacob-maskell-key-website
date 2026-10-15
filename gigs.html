@@ -1,0 +1,65 @@
+---
+layout: default
+title: Gigs
+permalink: /gigs/
+---
+<section class="page-header gigs-page-header">
+  <h1 class="hero-display">Gigs</h1>
+
+  <div class="gigs-toggle" role="tablist">
+    <button type="button" class="is-active" data-filter="upcoming">Upcoming</button>
+    <button type="button" data-filter="past">Past</button>
+  </div>
+</section>
+
+<section class="gig-list" id="gig-list">
+  {% for gig in site.data.gigs %}
+    {% include gig-row.html status=gig.status year=gig.year date=gig.date city=gig.city venue=gig.venue project=gig.project %}
+  {% endfor %}
+</section>
+
+<script>
+  (function () {
+    var buttons = document.querySelectorAll('.gigs-toggle button');
+    var rows = document.querySelectorAll('.gig-row');
+    var FADE_MS = 220;
+    var currentFilter = null;
+
+    function showFilter(filter) {
+      rows.forEach(function (row) {
+        row.style.display = row.dataset.status === filter ? 'flex' : 'none';
+      });
+      // force reflow so the removed .is-fading class transitions back in
+      void document.getElementById('gig-list').offsetWidth;
+      rows.forEach(function (row) {
+        if (row.dataset.status === filter) {
+          row.classList.remove('is-fading');
+        }
+      });
+      currentFilter = filter;
+    }
+
+    function applyFilter(filter) {
+      if (filter === currentFilter) return;
+
+      if (currentFilter === null) {
+        // first run: no fade-out needed, just show the initial set
+        showFilter(filter);
+        return;
+      }
+
+      rows.forEach(function (row) { row.classList.add('is-fading'); });
+      setTimeout(function () { showFilter(filter); }, FADE_MS);
+    }
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        buttons.forEach(function (b) { b.classList.remove('is-active'); });
+        btn.classList.add('is-active');
+        applyFilter(btn.dataset.filter);
+      });
+    });
+
+    applyFilter('upcoming');
+  })();
+</script>

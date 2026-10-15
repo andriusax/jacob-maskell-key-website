@@ -1,0 +1,14 @@
+---
+layout: default
+title: Music Videos
+permalink: /music-videos/
+---
+<section class="page-header">
+  <h1 class="hero-display">Music Videos</h1>
+</section>
+
+<section style="padding-bottom: 32px;">
+  {% for video in site.data.music_videos %}
+    {% include video-card.html title=video.title youtube_id=video.youtube_id description=video.description credits=video.credits %}
+  {% endfor %}
+</section>

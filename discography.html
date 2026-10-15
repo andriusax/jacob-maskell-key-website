@@ -1,0 +1,14 @@
+---
+layout: default
+title: Discography
+permalink: /discography/
+---
+<section class="page-header">
+  <h1 class="hero-display">Discography</h1>
+</section>
+
+<section class="card-grid">
+  {% for album in site.data.discography %}
+    {% include album-card.html band=album.band album=album.album year=album.year image=album.image link=album.link %}
+  {% endfor %}
+</section>

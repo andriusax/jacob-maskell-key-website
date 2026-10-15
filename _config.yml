@@ -1,0 +1,27 @@
+title: Jacob Maskell-Key
+description: Composer, producer and member of Nihiloxica.
+baseurl: ""
+url: ""
+
+markdown: kramdown
+permalink: pretty
+
+collections:
+  gigs:
+    output: false
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - node_modules

@@ -1,0 +1,7 @@
+<a class="press-card" href="{{ include.url }}" target="_blank" rel="noopener">
+  <div class="press-card__image" style="background-image: url('https://api.microlink.io/?url={{ include.url | url_encode }}&embed=image.url');"></div>
+  <div class="press-card__content">
+    <span class="press-card__publication">{{ include.publication }}</span>
+    <span class="press-card__title">{{ include.title }}</span>
+  </div>
+</a>

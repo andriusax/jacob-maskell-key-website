@@ -1,0 +1,13 @@
+<div class="video-card">
+  <div class="video-card__media">
+    <iframe src="https://www.youtube.com/embed/{{ include.youtube_id }}" title="{{ include.title }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+  </div>
+  <div class="video-card__text">
+    <h3 class="video-card__title">{{ include.title }}</h3>
+    <div class="video-card__credits">
+      {% for line in include.credits %}{{ line }}
+{% endfor %}
+    </div>
+    <p class="video-card__description">{{ include.description }}</p>
+  </div>
+</div>

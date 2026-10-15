@@ -1,0 +1,17 @@
+<div class="gig-row" data-status="{{ include.status }}">
+  <div class="gig-row__col">
+    <span class="gig-row__year">{{ include.year }}</span>
+    <span class="gig-row__date">{{ include.date }}</span>
+  </div>
+
+  <div class="gig-row__place">
+    <span class="gig-row__city">{{ include.city }}</span>
+    <span class="gig-row__venue">{{ include.venue }}</span>
+  </div>
+
+  <span class="gig-row__project">{{ include.project }}</span>
+
+  <svg class="gig-row__arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</div>

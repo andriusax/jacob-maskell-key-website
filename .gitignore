@@ -1,0 +1,7 @@
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.ruby-lsp/
+.bundle/
+vendor/
+.DS_Store

@@ -1,0 +1,43 @@
+<nav class="navbar">
+  <div class="navbar__brand">
+    <a href="{{ '/' | relative_url }}" class="navbar__name">Jacob Maskell-Key</a>
+    <div class="navbar__socials">
+      <a href="https://instagram.com/" class="navbar__social-icon" aria-label="Instagram" target="_blank" rel="noopener">
+        <i class="fa-brands fa-instagram"></i>
+      </a>
+      <a href="https://linkedin.com/" class="navbar__social-icon" aria-label="LinkedIn" target="_blank" rel="noopener">
+        <i class="fa-brands fa-linkedin"></i>
+      </a>
+    </div>
+  </div>
+
+  <div class="navbar__groups">
+    <div class="navbar__group">
+      <span class="navbar__group-title">Music</span>
+      <ul class="navbar__group-list">
+        <li><a href="{{ '/discography/' | relative_url }}">Discography</a></li>
+        <li><a href="{{ '/live-projects/' | relative_url }}">Live Projects</a></li>
+        <li><a href="{{ '/gigs/' | relative_url }}">Gigs</a></li>
+        <li><a href="{{ '/remixes/' | relative_url }}">Remixes</a></li>
+      </ul>
+    </div>
+
+    <div class="navbar__group">
+      <span class="navbar__group-title">Video</span>
+      <ul class="navbar__group-list">
+        <li><a href="{{ '/music-videos/' | relative_url }}">Music Videos</a></li>
+        <li><a href="{{ '/commisions/' | relative_url }}">Commisions</a></li>
+      </ul>
+    </div>
+
+    <div class="navbar__group">
+      <span class="navbar__group-title">More</span>
+      <ul class="navbar__group-list">
+        <li><a href="{{ '/about/' | relative_url }}">About</a></li>
+        <li><a href="{{ '/contact/' | relative_url }}">Contact</a></li>
+        <li><a href="{{ '/shop/' | relative_url }}">Shop</a></li>
+        <li><a href="{{ '/press/' | relative_url }}">Press</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
