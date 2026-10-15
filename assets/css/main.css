@@ -445,6 +445,15 @@ a { color: inherit; text-decoration: none; }
   .pill-btn { width: 100%; border-radius: 8px; margin-top: 8px; }
 }
 
+/* Reserves the button's max (hover) width permanently, so growing it never
+   reflows or overlaps the album title next to it */
+.listen-btn-slot {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  width: 112px;
+}
+
 /* Listen button: icon pill that expands to show the label on hover */
 .listen-btn {
   position: relative;
@@ -508,6 +517,10 @@ a { color: inherit; text-decoration: none; }
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
+  }
+
+  .listen-btn-slot {
+    width: 100%;
   }
 
   .listen-btn {
