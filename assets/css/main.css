@@ -483,34 +483,47 @@ a { color: inherit; text-decoration: none; }
   transition: transform 0.3s ease, opacity 0.2s ease;
 }
 
-.listen-btn:hover {
-  width: 112px;
-  background: var(--color-heading);
-  box-shadow: 0 10px 22px rgba(0, 8, 49, 0.28);
-}
+@media (hover: hover) and (pointer: fine) {
+  .listen-btn:hover {
+    width: 112px;
+    background: var(--color-heading);
+    box-shadow: 0 10px 22px rgba(0, 8, 49, 0.28);
+  }
 
-.listen-btn:hover .listen-btn__icon {
-  transform: scale(0);
-  opacity: 0;
-  transition-delay: 0s;
-}
+  .listen-btn:hover .listen-btn__icon {
+    transform: scale(0);
+    opacity: 0;
+    transition-delay: 0s;
+  }
 
-.listen-btn:hover .listen-btn__label {
-  transform: scale(1);
-  opacity: 1;
-  transition-delay: 0.15s;
+  .listen-btn:hover .listen-btn__label {
+    transform: scale(1);
+    opacity: 1;
+    transition-delay: 0.15s;
+  }
 }
 
 @media (max-width: 600px) {
+  .album-card__bottom {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
   .listen-btn {
     width: 100%;
     height: 40px;
     border-radius: 8px;
     background: var(--color-heading);
     margin-top: 8px;
+    transition: none;
   }
   .listen-btn__icon { display: none; }
-  .listen-btn__label { transform: scale(1); opacity: 1; }
+  .listen-btn__label {
+    transform: none;
+    opacity: 1;
+    transition: none;
+  }
 }
 
 /* ---------------------------------------------
