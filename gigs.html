@@ -14,7 +14,7 @@ permalink: /gigs/
 
 <section class="gig-list" id="gig-list">
   {% for gig in site.data.gigs %}
-    {% include gig-row.html status=gig.status year=gig.year date=gig.date city=gig.city venue=gig.venue project=gig.project %}
+    {% include gig-row.html status=gig.status year=gig.year date=gig.date city=gig.city venue=gig.venue project=gig.project link=gig.link %}
   {% endfor %}
 </section>
 
