@@ -1,0 +1,16 @@
+<div class="commission-card">
+  <h3 class="commission-card__title">{{ include.title }}</h3>
+
+  <div class="commission-card__media">
+    <iframe src="https://www.youtube.com/embed/{{ include.youtube_id }}" title="{{ include.title }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+  </div>
+
+  <div class="commission-card__credits">
+    {% for line in include.credits %}
+      {% assign parts = line | split: ": " %}
+      <p><strong>{{ parts[0] }}:</strong> {{ parts[1] }}</p>
+    {% endfor %}
+  </div>
+
+  <p class="commission-card__description">{{ include.description }}</p>
+</div>

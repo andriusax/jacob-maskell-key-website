@@ -8,5 +8,7 @@ permalink: /commisions/
 </section>
 
 <section style="padding-bottom: 32px;">
-  <p class="body-text-light">Commission examples coming soon.</p>
+  {% for commission in site.data.commisions %}
+    {% include commission-card.html title=commission.title youtube_id=commission.youtube_id description=commission.description credits=commission.credits %}
+  {% endfor %}
 </section>
