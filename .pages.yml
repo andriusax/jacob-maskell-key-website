@@ -45,9 +45,9 @@ content:
       - name: status
         type: select
         options:
-          choices:
-            - { value: upcoming, label: Upcoming }
-            - { value: past, label: Past }
+          values:
+            - { name: upcoming, label: Upcoming }
+            - { name: past, label: Past }
       - { name: year, type: string }
       - { name: date, type: string, description: "e.g. 14 Nov" }
       - { name: city, type: string }
