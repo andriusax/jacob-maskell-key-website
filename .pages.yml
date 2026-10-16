@@ -1,0 +1,100 @@
+media:
+  - name: images
+    label: Images
+    input: assets/images/uploads
+    output: /assets/images/uploads
+    rename: safe
+    extensions: [png, jpg, jpeg, gif, webp]
+
+content:
+  - name: discography
+    label: Discography
+    type: file
+    path: _data/discography.yml
+    format: yaml
+    list: true
+    fields:
+      - { name: band, type: string }
+      - { name: album, type: string }
+      - { name: year, type: string }
+      - { name: image, type: image }
+      - { name: link, type: string, label: "Listen Link" }
+
+  - name: remixes
+    label: Remixes
+    type: file
+    path: _data/remixes.yml
+    format: yaml
+    list: true
+    fields:
+      - { name: band, type: string }
+      - { name: album, type: string }
+      - { name: label, type: string }
+      - { name: year, type: string }
+      - { name: image, type: image }
+      - { name: link, type: string, label: "Listen Link" }
+
+  - name: gigs
+    label: Gigs
+    type: file
+    path: _data/gigs.yml
+    format: yaml
+    list: true
+    fields:
+      - name: status
+        type: select
+        options:
+          choices:
+            - { value: upcoming, label: Upcoming }
+            - { value: past, label: Past }
+      - { name: year, type: string }
+      - { name: date, type: string, description: "e.g. 14 Nov" }
+      - { name: city, type: string }
+      - { name: venue, type: string }
+      - { name: project, type: string }
+      - { name: link, type: string, label: "Ticket Link" }
+
+  - name: music_videos
+    label: Watch (Music Videos)
+    type: file
+    path: _data/music_videos.yml
+    format: yaml
+    list: true
+    fields:
+      - { name: title, type: string }
+      - { name: youtube_id, type: string, label: "YouTube ID", description: "The part after watch?v= in the YouTube URL" }
+      - { name: description, type: text }
+      - name: credits
+        type: string
+        label: "Credits"
+        description: "One line per credit, e.g. Composition: Jacob Maskell-Key"
+        options:
+          list: true
+
+  - name: commisions
+    label: Commissions
+    type: file
+    path: _data/commisions.yml
+    format: yaml
+    list: true
+    fields:
+      - { name: title, type: string }
+      - { name: youtube_id, type: string, label: "YouTube ID", description: "The part after watch?v= in the YouTube URL" }
+      - { name: description, type: text }
+      - name: credits
+        type: string
+        label: "Credits"
+        description: "One line per credit, e.g. Composition: Jacob Maskell-Key"
+        options:
+          list: true
+
+  - name: press
+    label: Press
+    type: file
+    path: _data/press.yml
+    format: yaml
+    list: true
+    fields:
+      - { name: publication, type: string }
+      - { name: title, type: string }
+      - { name: url, type: string }
