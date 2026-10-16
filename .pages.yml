@@ -99,3 +99,14 @@ content:
       - { name: publication, type: string }
       - { name: title, type: string }
       - { name: url, type: string }
+
+  - name: live_projects
+    label: Live Projects
+    type: file
+    path: _data/live_projects.yml
+    format: yaml
+    list: true
+    fields:
+      - { name: name, type: string, label: "Project Name" }
+      - { name: image, type: image }
+      - { name: link, type: string, label: "Link" }

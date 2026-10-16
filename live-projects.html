@@ -8,9 +8,7 @@ permalink: /live-projects/
 </section>
 
 <section style="padding-bottom: 64px;">
-  <a class="band-card" href="#" style="text-decoration: none;">
-    <div class="band-card__image" style="background-image: url('{{ '/assets/images/placeholder-band.jpg' | relative_url }}');"></div>
-    <span class="band-card__name">Nihiloxica</span>
-    <hr>
-  </a>
+  {% for project in site.data.live_projects %}
+    {% include band-card.html name=project.name image=project.image link=project.link %}
+  {% endfor %}
 </section>
