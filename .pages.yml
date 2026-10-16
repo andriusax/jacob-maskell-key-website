@@ -42,14 +42,13 @@ content:
     format: yaml
     list: true
     fields:
-      - name: status
-        type: select
+      - name: date
+        type: date
+        label: "Gig Date"
+        description: "Upcoming/Past is worked out automatically from this date — no need to set it manually."
+        default: ""
         options:
-          values:
-            - { name: upcoming, label: Upcoming }
-            - { name: past, label: Past }
-      - { name: year, type: string }
-      - { name: date, type: string, description: "e.g. 14 Nov" }
+          format: yyyy-MM-dd
       - { name: city, type: string }
       - { name: venue, type: string }
       - { name: project, type: string }

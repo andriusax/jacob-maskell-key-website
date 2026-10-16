@@ -1,7 +1,11 @@
-<a class="gig-row" href="{{ include.link | default: '#' }}" data-status="{{ include.status }}">
+{% assign gig_epoch = include.date | date: "%s" %}
+{% assign today_epoch = site.time | date: "%s" %}
+{% assign gig_status = "past" %}
+{% if gig_epoch >= today_epoch %}{% assign gig_status = "upcoming" %}{% endif %}
+<a class="gig-row" href="{{ include.link | default: '#' }}" data-status="{{ gig_status }}">
   <div class="gig-row__col">
-    <span class="gig-row__year">{{ include.year }}</span>
-    <span class="gig-row__date">{{ include.date }}</span>
+    <span class="gig-row__year">{{ include.date | date: "%Y" }}</span>
+    <span class="gig-row__date">{{ include.date | date: "%-d %b" }}</span>
   </div>
 
   <div class="gig-row__place">
