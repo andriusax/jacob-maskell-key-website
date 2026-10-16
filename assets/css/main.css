@@ -333,8 +333,13 @@ a { color: inherit; text-decoration: none; }
   max-width: 560px;
 }
 
-.about-bio__text .body-text-light {
+.about-bio__text p {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--size-body);
+  line-height: var(--line-body);
   color: var(--color-heading);
+  margin: 0;
 }
 
 .about-bio__text a {

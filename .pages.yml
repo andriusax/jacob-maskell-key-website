@@ -7,6 +7,19 @@ media:
     extensions: [png, jpg, jpeg, gif, webp]
 
 content:
+  - name: about
+    label: About
+    type: file
+    path: _data/about.yml
+    format: yaml
+    fields:
+      - name: bio
+        label: Bio
+        type: rich-text
+        description: "Select a word or phrase and use the link button in the toolbar to turn it into a hyperlink. Links always open in a new tab automatically."
+        options:
+          format: markdown
+
   - name: discography
     label: Discography
     type: file
