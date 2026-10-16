@@ -201,11 +201,11 @@ a { color: inherit; text-decoration: none; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   color: var(--color-heading);
-  font-size: 16px;
+  font-size: 24px;
   overflow: hidden;
   z-index: 1;
 }
@@ -340,6 +340,26 @@ a { color: inherit; text-decoration: none; }
 .about-bio__text a {
   text-decoration: underline;
 }
+
+@keyframes about-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.about-bio__text p {
+  opacity: 0;
+  animation: about-fade-in 0.7s ease forwards;
+}
+
+.about-bio__text p:nth-child(1) { animation-delay: 0.1s; }
+.about-bio__text p:nth-child(2) { animation-delay: 0.28s; }
+.about-bio__text p:nth-child(3) { animation-delay: 0.46s; }
 
 @media (max-width: 760px) {
   .about-bio {
