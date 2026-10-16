@@ -16,6 +16,7 @@ content:
     fields:
       - { name: band, type: string }
       - { name: album, type: string }
+      - { name: label, type: string, label: "Record Label" }
       - { name: year, type: string }
       - { name: image, type: image }
       - { name: link, type: string, label: "Listen Link" }
@@ -29,7 +30,7 @@ content:
     fields:
       - { name: band, type: string }
       - { name: album, type: string }
-      - { name: label, type: string }
+      - { name: label, type: string, label: "Record Label" }
       - { name: year, type: string }
       - { name: image, type: image }
       - { name: link, type: string, label: "Listen Link" }

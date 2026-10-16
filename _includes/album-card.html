@@ -9,6 +9,9 @@
       <div class="album-card__titles">
         <span class="album-card__band">{{ include.band }}</span>
         <span class="album-card__album">{{ include.album }}</span>
+        {% if include.label and include.label != "" %}
+          <span class="album-card__record-label">{{ include.label }}</span>
+        {% endif %}
       </div>
       <span class="listen-btn-slot">
         <span class="listen-btn">

@@ -9,6 +9,6 @@ permalink: /discography/
 
 <section class="card-grid">
   {% for album in site.data.discography %}
-    {% include album-card.html band=album.band album=album.album year=album.year image=album.image link=album.link %}
+    {% include album-card.html band=album.band album=album.album label=album.label year=album.year image=album.image link=album.link %}
   {% endfor %}
 </section>

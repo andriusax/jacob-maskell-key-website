@@ -9,6 +9,6 @@ permalink: /remixes/
 
 <section class="card-grid">
   {% for remix in site.data.remixes %}
-    {% include album-card.html band=remix.band album=remix.album year=remix.year image=remix.image link=remix.link %}
+    {% include album-card.html band=remix.band album=remix.album label=remix.label year=remix.year image=remix.image link=remix.link %}
   {% endfor %}
 </section>
