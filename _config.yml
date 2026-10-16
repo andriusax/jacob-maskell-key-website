@@ -1,5 +1,8 @@
 title: Jacob Maskell-Key
 description: Composer, producer and member of Nihiloxica.
+logo: /assets/images/favicon.png
+twitter:
+  card: summary
 # baseurl is left blank so local dev (`jekyll serve`) still serves at the
 # root (http://127.0.0.1:4000/) — the GitHub Actions workflow passes the
 # correct project-page baseurl at build time instead (see .github/workflows/pages.yml)
@@ -18,6 +21,10 @@ defaults:
       path: ""
     values:
       layout: "default"
+      # Default preview image for link shares (WhatsApp, iMessage, Slack,
+      # etc.) via jekyll-seo-tag's og:image / twitter:image. Override on a
+      # specific page with its own `image:` front matter value if needed.
+      image: /assets/images/favicon.png
 
 plugins:
   - jekyll-feed
