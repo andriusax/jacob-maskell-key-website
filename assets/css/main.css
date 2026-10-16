@@ -197,14 +197,48 @@ a { color: inherit; text-decoration: none; }
 }
 
 .navbar__social-icon {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   color: var(--color-heading);
-  font-size: 22px;
+  font-size: 16px;
+  overflow: hidden;
+  z-index: 1;
 }
 
-.navbar__social-icon:hover { color: var(--color-link); }
+.navbar__social-icon i {
+  position: relative;
+  z-index: 3;
+  transition: color 0.4s ease, transform 0.5s ease;
+}
+
+.navbar__social-icon::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: top 0.4s ease;
+  z-index: 2;
+}
+
+.navbar__social-icon:hover i {
+  color: var(--color-white);
+  transform: rotateY(360deg);
+}
+
+.navbar__social-icon:hover::before { top: 0; }
+
+.navbar__social-icon[aria-label="Instagram"]::before {
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+}
+
+.navbar__social-icon[aria-label="LinkedIn"]::before { background: #0077b5; }
 
 .navbar__groups {
   display: flex;
@@ -882,14 +916,22 @@ a { color: inherit; text-decoration: none; }
   box-sizing: border-box;
   width: 100%;
   background: var(--color-white);
-  border: 1px solid var(--color-black);
+  border: 1px solid rgba(0, 8, 49, 0.12);
   border-radius: 12px;
   padding: 18px 22px;
   font-family: var(--font-display);
   font-weight: 400;
   font-size: var(--size-body);
   color: var(--color-heading);
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+  box-shadow: 0 4px 12px rgba(0, 8, 49, 0.08);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--color-heading);
+  box-shadow: 0 6px 16px rgba(0, 8, 49, 0.14);
 }
 
 .form-field textarea { min-height: 200px; resize: vertical; }
