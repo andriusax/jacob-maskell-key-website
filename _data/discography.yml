@@ -4,12 +4,6 @@
   year: "2025"
   image: /assets/images/uploads/a102917299710.jpg
   link: https://sundriedunderstandings.bandcamp.com/album/jessica-album
-- band: Nihiloxica
-  album: Source of Denial
-  label: Crammed Discs
-  year: "2023"
-  image: /assets/images/uploads/a371962331510.jpg
-  link: https://nihiloxica.bandcamp.com/album/source-of-denial
 - band: Use Knife
   album: "Freedom, Asshole "
   label: VIERNULVIER Records
@@ -22,6 +16,12 @@
   year: "2024"
   image: /assets/images/uploads/a42783155171x1700.jpg
   link: https://spookyshit.bandcamp.com/album/completely-shit-vol-1
+- band: Nihiloxica
+  album: Source of Denial
+  label: Crammed Discs
+  year: "2023"
+  image: /assets/images/uploads/a371962331510.jpg
+  link: https://nihiloxica.bandcamp.com/album/source-of-denial
 - band: "Hot In Da Club "
   album: Funktion Banned
   label: Seilscheibenpfeiler
