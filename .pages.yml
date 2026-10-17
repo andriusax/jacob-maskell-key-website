@@ -7,6 +7,15 @@ media:
     extensions: [png, jpg, jpeg, gif, webp]
 
 content:
+  - name: home
+    label: Home Page
+    type: file
+    path: _data/home.yml
+    format: yaml
+    fields:
+      - { name: hero_left, type: image, label: "Left Hero Media (gif or image)" }
+      - { name: hero_right, type: image, label: "Right Hero Media (gif or image)" }
+
   - name: about
     label: About
     type: file
