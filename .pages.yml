@@ -81,8 +81,7 @@ content:
         type: string
         label: "Credits"
         description: "One line per credit, e.g. Composition: Jacob Maskell-Key"
-        options:
-          list: true
+        list: true
 
   - name: commisions
     label: Commissions
@@ -98,8 +97,7 @@ content:
         type: string
         label: "Credits"
         description: "One line per credit, e.g. Composition: Jacob Maskell-Key"
-        options:
-          list: true
+        list: true
 
   - name: press
     label: Press
