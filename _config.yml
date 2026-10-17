@@ -5,9 +5,11 @@ twitter:
   card: summary
 # baseurl is left blank so local dev (`jekyll serve`) still serves at the
 # root (http://127.0.0.1:4000/) — the GitHub Actions workflow passes the
-# correct project-page baseurl at build time instead (see .github/workflows/pages.yml)
+# correct project-page baseurl at build time instead (see .github/workflows/pages.yml).
+# Once on the custom domain, GitHub Pages serves from the root, so the
+# workflow's base_path output resolves to "" automatically too.
 baseurl: ""
-url: "https://andriusax.github.io"
+url: "https://jacobmkey.work"
 
 markdown: kramdown
 permalink: pretty
