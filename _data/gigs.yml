@@ -12,3 +12,683 @@
   city: Shanghai, China
   venue: Trigger
   project: Spooky-J
+- date: 2018-02-03
+  city: "Berlin, Germany"
+  venue: "CTM Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2018-05-31
+  city: "Düdingen, Switzerland"
+  venue: "Bad Bonn Kilbi"
+  project: Nihiloxica
+  link: ""
+- date: 2018-06-02
+  city: "Porto, Portugal"
+  venue: "Serralves Em Festa"
+  project: Nihiloxica
+  link: ""
+- date: 2018-06-03
+  city: "Vigo, Spain"
+  venue: "La Fabrica de Chocolate Club"
+  project: Nihiloxica
+  link: ""
+- date: 2018-06-06
+  city: "Aveiro, Portugal"
+  venue: "Show (Gretua)"
+  project: Nihiloxica
+  link: ""
+- date: 2018-06-07
+  city: "Lisbon, Portugal"
+  venue: "Damas"
+  project: Nihiloxica
+  link: ""
+- date: 2018-06-08
+  city: "Coimbra, Portugal"
+  venue: "Salão Brasil + workshop"
+  project: Nihiloxica
+  link: ""
+- date: 2018-06-21
+  city: "Brussels, Belgium"
+  venue: "AB"
+  project: Nihiloxica
+  link: ""
+- date: 2018-06-22
+  city: "Groningen, The Netherlands"
+  venue: "LOFT"
+  project: Nihiloxica
+  link: ""
+- date: 2018-06-23
+  city: "Amsterdam, The Netherlands"
+  venue: "Strange Sounds from Beyond"
+  project: Nihiloxica
+  link: ""
+- date: 2018-06-26
+  city: "Hamburg, Germany"
+  venue: "Hafenklang"
+  project: Nihiloxica
+  link: ""
+- date: 2018-06-29
+  city: "Berlin, Germany"
+  venue: "ACUD MACHT NEU"
+  project: Nihiloxica
+  link: ""
+- date: 2018-07-01
+  city: "Lärz, Germany"
+  venue: "Fusion Festival (Karlkutter)"
+  project: Nihiloxica
+  link: ""
+- date: 2018-07-04
+  city: "Roskilde, Denmark"
+  venue: "Roskilde Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2018-09-29
+  city: "Paris, France"
+  venue: "La Station (Red Bull Hyperstation)"
+  project: Nihiloxica
+  link: ""
+- date: 2018-12-08
+  city: "Rennes, France"
+  venue: "Transmusicales"
+  project: Nihiloxica
+  link: ""
+- date: 2019-04-27
+  city: "Paris, France"
+  venue: "Le Hasard Ludique"
+  project: Nihiloxica
+  link: ""
+- date: 2019-05-01
+  city: "Arlon, Belgium"
+  venue: "Les Aralunaires Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2019-05-03
+  city: "Brussels, Belgium"
+  venue: "Le Botanique"
+  project: Nihiloxica
+  link: ""
+- date: 2019-05-04
+  city: "Basel, Switzerland"
+  venue: "Kaserne"
+  project: Nihiloxica
+  link: ""
+- date: 2019-05-10
+  city: "Düdingen, Switzerland"
+  venue: "Bad Bonn"
+  project: Nihiloxica
+  link: ""
+- date: 2019-05-11
+  city: "Barcelona, Spain"
+  venue: "Razzmatazz"
+  project: Nihiloxica
+  link: ""
+- date: 2019-05-16
+  city: "Nantes, France"
+  venue: "Université"
+  project: Nihiloxica
+  link: ""
+- date: 2019-05-18
+  city: "Strasbourg, France"
+  venue: "Molodoi"
+  project: Nihiloxica
+  link: ""
+- date: 2019-05-25
+  city: "Amsterdam, The Netherlands"
+  venue: "Lentekabinet Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2019-06-01
+  city: "Lyon, France"
+  venue: "Nuits Sonores Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2019-06-08
+  city: "Turin, Italy"
+  venue: "Blackout Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2019-06-09
+  city: "Milan, Italy"
+  venue: "Buka"
+  project: Nihiloxica
+  link: ""
+- date: 2019-06-10
+  city: "Ravenna, Italy"
+  venue: "Ravenna Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2019-09-13
+  city: "Santiago de Compostela, Spain"
+  venue: "WOS Fest"
+  project: Nihiloxica
+  link: ""
+- date: 2019-09-14
+  city: "London, UK"
+  venue: "Printworks"
+  project: Nihiloxica
+  link: ""
+- date: 2019-09-21
+  city: "The Hague, The Netherlands"
+  venue: "TodaysArt Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2019-09-26
+  city: "Antwerp, Belgium"
+  venue: "Het Bos"
+  project: Nihiloxica
+  link: ""
+- date: 2019-09-27
+  city: "Brussels, Belgium"
+  venue: "A210"
+  project: Nihiloxica
+  link: ""
+- date: 2019-10-01
+  city: "London, UK"
+  venue: "The Cause"
+  project: Nihiloxica
+  link: ""
+- date: 2019-10-02
+  city: "Bristol, UK"
+  venue: "Colston Hall"
+  project: Nihiloxica
+  link: ""
+- date: 2019-10-03
+  city: "Manchester, UK"
+  venue: "White Hotel"
+  project: Nihiloxica
+  link: ""
+- date: 2019-10-04
+  city: "Leeds, UK"
+  venue: "Temple of Boom"
+  project: Nihiloxica
+  link: ""
+- date: 2019-10-05
+  city: "Edinburgh, UK"
+  venue: "La Belle"
+  project: Nihiloxica
+  link: ""
+- date: 2019-10-11
+  city: "Cologne, Germany"
+  venue: "Night of Surprise"
+  project: Nihiloxica
+  link: ""
+- date: 2019-10-18
+  city: "Nancy, France"
+  venue: "Nancy Jazz Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2019-10-19
+  city: "Lille, France"
+  venue: "Aéronef"
+  project: Nihiloxica
+  link: ""
+- date: 2019-10-22
+  city: "Berlin, Germany"
+  venue: "Gretchen"
+  project: Nihiloxica
+  link: ""
+- date: 2019-10-26
+  city: "Tromsø, Norway"
+  venue: "Insomnia Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2019-10-30
+  city: "Copenhagen, Denmark"
+  venue: "Alice"
+  project: Nihiloxica
+  link: ""
+- date: 2019-10-31
+  city: "Gothenburg, Sweden"
+  venue: "Clandestino Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2019-11-01
+  city: "Oslo, Norway"
+  venue: "Oslo World"
+  project: Nihiloxica
+  link: ""
+- date: 2019-11-07
+  city: "San Sebastián, Spain"
+  venue: "Dabadaba"
+  project: Nihiloxica
+  link: ""
+- date: 2019-11-08
+  city: "Barcelona, Spain"
+  venue: "Mira Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2019-11-09
+  city: "Madrid, Spain"
+  venue: "Siroco"
+  project: Nihiloxica
+  link: ""
+- date: 2019-11-10
+  city: "Zaragoza, Spain"
+  venue: "Centro Cívico La Almozara"
+  project: Nihiloxica
+  link: ""
+- date: 2021-05-21
+  city: "Moers, Germany"
+  venue: "Moers Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2021-10-14
+  city: "Geneva, Switzerland"
+  venue: "La Gravière"
+  project: Nihiloxica
+  link: ""
+- date: 2021-10-15
+  city: "Basel, Switzerland"
+  venue: "Kaserne"
+  project: Nihiloxica
+  link: ""
+- date: 2021-10-16
+  city: "Bern, Switzerland"
+  venue: "Dachstock"
+  project: Nihiloxica
+  link: ""
+- date: 2021-10-17
+  city: "St. Gallen, Switzerland"
+  venue: "Palace St. Gallen"
+  project: Nihiloxica
+  link: ""
+- date: 2021-10-22
+  city: "Brussels, Belgium"
+  venue: "Botanique"
+  project: Nihiloxica
+  link: ""
+- date: 2021-10-23
+  city: "Rotterdam, The Netherlands"
+  venue: "Bird"
+  project: Nihiloxica
+  link: ""
+- date: 2021-10-24
+  city: "Amsterdam, The Netherlands"
+  venue: "Paradiso Noord"
+  project: Nihiloxica
+  link: ""
+- date: 2021-10-27
+  city: "Aarhus, Denmark"
+  venue: "Alter Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2021-10-28
+  city: "Malmö, Sweden"
+  venue: "Plan B"
+  project: Nihiloxica
+  link: ""
+- date: 2021-10-29
+  city: "Copenhagen, Denmark"
+  venue: "Mayhem"
+  project: Nihiloxica
+  link: ""
+- date: 2021-10-31
+  city: "Stockholm, Sweden"
+  venue: "Fasching Jazz Club"
+  project: Nihiloxica
+  link: ""
+- date: 2021-11-02
+  city: "Paris, France"
+  venue: "Petit Bain"
+  project: Nihiloxica
+  link: ""
+- date: 2021-11-04
+  city: "Glasgow, UK"
+  venue: "Stereo"
+  project: Nihiloxica
+  link: ""
+- date: 2021-11-05
+  city: "Birkenhead, UK"
+  venue: "Future Yard"
+  project: Nihiloxica
+  link: ""
+- date: 2021-11-06
+  city: "Manchester, UK"
+  venue: "White Hotel"
+  project: Nihiloxica
+  link: ""
+- date: 2021-11-07
+  city: "Newcastle, UK"
+  venue: "Cobalt Studios"
+  project: Nihiloxica
+  link: ""
+- date: 2021-11-08
+  city: "Leeds, UK"
+  venue: "Headrow House"
+  project: Nihiloxica
+  link: ""
+- date: 2021-11-09
+  city: "London, UK"
+  venue: "Jazz Cafe"
+  project: Nihiloxica
+  link: ""
+- date: 2021-11-10
+  city: "Bristol, UK"
+  venue: "Strange Brew"
+  project: Nihiloxica
+  link: ""
+- date: 2021-11-13
+  city: "Tenerife, Spain"
+  venue: "Keroxen"
+  project: Nihiloxica
+  link: ""
+- date: 2022-06-18
+  city: "Barcelona, Spain"
+  venue: "Sónar Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2022-06-19
+  city: "Monheim, Germany"
+  venue: "Monheim Triennale"
+  project: Nihiloxica
+  link: ""
+- date: 2022-06-30
+  city: "Lärz, Germany"
+  venue: "Fusion Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2022-07-22
+  city: "London, UK"
+  venue: "Studio 9294"
+  project: Nihiloxica
+  link: ""
+- date: 2022-07-23
+  city: "Leysin, Switzerland"
+  venue: "Hautes Fréquences Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2022-07-30
+  city: "Siracusa, Italy"
+  venue: "OSS Fest"
+  project: Nihiloxica
+  link: ""
+- date: 2022-08-03
+  city: "Luxembourg, Luxembourg"
+  venue: "Les Congés Annulés"
+  project: Nihiloxica
+  link: ""
+- date: 2022-08-05
+  city: "Amsterdam, The Netherlands"
+  venue: "Dekmantel"
+  project: Nihiloxica
+  link: ""
+- date: 2022-08-07
+  city: "Garbicz, Poland"
+  venue: "Garbicz Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2022-08-12
+  city: "Helsinki, Finland"
+  venue: "Flow Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2022-08-18
+  city: "Warsaw, Poland"
+  venue: "Lado w Mieście"
+  project: Nihiloxica
+  link: ""
+- date: 2022-08-19
+  city: "Geneva, Switzerland"
+  venue: "Scène Ella Fitzgerald"
+  project: Nihiloxica
+  link: ""
+- date: 2023-04-22
+  city: "Ljubljana, Slovenia"
+  venue: "Sonica Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2023-04-28
+  city: "Krems, Austria"
+  venue: "Donau Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2023-05-05
+  city: "Amsterdam, The Netherlands"
+  venue: "Ruisburo"
+  project: Nihiloxica
+  link: ""
+- date: 2023-05-16
+  city: "Berlin, Germany"
+  venue: "Betonhalle"
+  project: Nihiloxica
+  link: ""
+- date: 2023-05-19
+  city: "Norfolk, UK"
+  venue: "Spiegeltent"
+  project: Nihiloxica
+  link: ""
+- date: 2023-05-20
+  city: "Hamburg, Germany"
+  venue: "Papiripar Fest"
+  project: Nihiloxica
+  link: ""
+- date: 2023-07-23
+  city: "Manchester, UK"
+  venue: "Bluedot Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2023-07-28
+  city: "Wales, UK"
+  venue: "Unwedding Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2023-07-30
+  city: "Malmesbury, UK"
+  venue: "WOMAD"
+  project: Nihiloxica
+  link: ""
+- date: 2023-08-25
+  city: "Pordenone, Italy"
+  venue: "Threesound Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2023-08-27
+  city: "Northampton, UK"
+  venue: "Shambala Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2023-10-06
+  city: "San Sebastián, Spain"
+  venue: "Dabadaba"
+  project: Nihiloxica
+  link: ""
+- date: 2023-10-07
+  city: "Barcelona, Spain"
+  venue: "Razzmatazz"
+  project: Nihiloxica
+  link: ""
+- date: 2023-10-11
+  city: "Carlisle, UK"
+  venue: "The Brickyard"
+  project: Nihiloxica
+  link: ""
+- date: 2023-10-12
+  city: "Glasgow, UK"
+  venue: "The Rum Shack"
+  project: Nihiloxica
+  link: ""
+- date: 2023-10-14
+  city: "Newcastle, UK"
+  venue: "Cobalt Studios"
+  project: Nihiloxica
+  link: ""
+- date: 2023-10-19
+  city: "Bristol, UK"
+  venue: "Strange Brew"
+  project: Nihiloxica
+  link: ""
+- date: 2023-10-20
+  city: "London, UK"
+  venue: "Jazz Cafe"
+  project: Nihiloxica
+  link: ""
+- date: 2023-10-21
+  city: "Manchester, UK"
+  venue: "White Hotel"
+  project: Nihiloxica
+  link: ""
+- date: 2023-10-25
+  city: "Brno, Czech Republic"
+  venue: "Kabinet Múz"
+  project: Nihiloxica
+  link: ""
+- date: 2023-10-27
+  city: "Prague, Czech Republic"
+  venue: "Underdogs"
+  project: Nihiloxica
+  link: ""
+- date: 2023-10-28
+  city: "Bratislava, Slovakia"
+  venue: "A4"
+  project: Nihiloxica
+  link: ""
+- date: 2023-10-31
+  city: "Innsbruck, Austria"
+  venue: "PMK"
+  project: Nihiloxica
+  link: ""
+- date: 2023-11-01
+  city: "Tampere, Finland"
+  venue: "G Livelab"
+  project: Nihiloxica
+  link: ""
+- date: 2023-11-02
+  city: "Helsinki, Finland"
+  venue: "Korjaamo"
+  project: Nihiloxica
+  link: ""
+- date: 2023-11-03
+  city: "Malmö, Sweden"
+  venue: "Inkonst"
+  project: Nihiloxica
+  link: ""
+- date: 2023-11-04
+  city: "Copenhagen, Denmark"
+  venue: "Alice"
+  project: Nihiloxica
+  link: ""
+- date: 2023-11-07
+  city: "Hamburg, Germany"
+  venue: "MS Stubnitz"
+  project: Nihiloxica
+  link: ""
+- date: 2023-11-09
+  city: "Berlin, Germany"
+  venue: "Supamolly"
+  project: Nihiloxica
+  link: ""
+- date: 2023-11-10
+  city: "Antwerp, Belgium"
+  venue: "Het Bos"
+  project: Nihiloxica
+  link: ""
+- date: 2023-11-11
+  city: "Utrecht, The Netherlands"
+  venue: "Le Guess Who?"
+  project: Nihiloxica
+  link: ""
+- date: 2023-11-17
+  city: "Lisbon, Portugal"
+  venue: "Vale Perdido"
+  project: Nihiloxica
+  link: ""
+- date: 2023-11-18
+  city: "Paris, France"
+  venue: "La Station"
+  project: Nihiloxica
+  link: ""
+- date: 2023-11-19
+  city: "Ghent, Belgium"
+  venue: "Wintercircus"
+  project: Nihiloxica
+  link: ""
+- date: 2024-06-21
+  city: "Katowice, Poland"
+  venue: "Tauron Nowa Muzyka"
+  project: Nihiloxica
+  link: ""
+- date: 2024-06-22
+  city: "Brussels, Belgium"
+  venue: "Fête de la Musique"
+  project: Nihiloxica
+  link: ""
+- date: 2024-06-26
+  city: "Lille, France"
+  venue: "Aéronef"
+  project: Nihiloxica
+  link: ""
+- date: 2024-06-27
+  city: "Brest, France"
+  venue: "Astropolis"
+  project: Nihiloxica
+  link: ""
+- date: 2024-07-18
+  city: "Amsterdam, The Netherlands"
+  venue: "Garage Noord"
+  project: Nihiloxica
+  link: ""
+- date: 2024-07-21
+  city: "Berlin, Germany"
+  venue: "Sonic Pluriverse Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2024-07-25
+  city: "Kraków, Poland"
+  venue: "Betel"
+  project: Nihiloxica
+  link: ""
+- date: 2024-07-27
+  city: "Katowice, Poland"
+  venue: "Castel Bizzaro"
+  project: Nihiloxica
+  link: ""
+- date: 2024-07-31
+  city: "Ozora, Hungary"
+  venue: "Ozora Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2024-08-01
+  city: "Zagreb, Croatia"
+  venue: "Klub Močvara"
+  project: Nihiloxica
+  link: ""
+- date: 2024-08-02
+  city: "Ancona, Italy"
+  venue: "Nawevo Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2024-08-03
+  city: "Genoa, Italy"
+  venue: "Villa Rossi Martini"
+  project: Nihiloxica
+  link: ""
+- date: 2026-04-04
+  city: "Brussels, Belgium"
+  venue: "BRDCST Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2026-04-08
+  city: "Copenhagen, Denmark"
+  venue: "Loppen"
+  project: Nihiloxica
+  link: ""
+- date: 2026-04-09
+  city: "Bremen, Germany"
+  venue: "Kultur im Bunker"
+  project: Nihiloxica
+  link: ""
+- date: 2026-04-10
+  city: "The Hague, The Netherlands"
+  venue: "Rewire Festival"
+  project: Nihiloxica
+  link: ""
+- date: 2026-04-11
+  city: "Hamburg, Germany"
+  venue: "BEEK"
+  project: Nihiloxica
+  link: ""
+- date: 2026-08-28
+  city: "Zurich, Switzerland"
+  venue: "Theater Spektakel"
+  project: Nihiloxica
+  link: ""
