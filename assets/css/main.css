@@ -1046,3 +1046,34 @@ a { color: inherit; text-decoration: none; }
   .send-btn__icon { display: none; }
   .send-btn__label { transform: scale(1); opacity: 1; }
 }
+
+/* ---------------------------------------------
+   Inline Bandcamp player on album cards
+   (Listen button swaps for the player; cover + title still link out)
+--------------------------------------------- */
+.album-card__image { display: block; }
+
+.album-card__titles { color: inherit; text-decoration: none; }
+
+button.listen-btn {
+  border: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.album-card__player { display: none; width: 100%; }
+
+.album-card.is-playing .listen-btn-slot { display: none; }
+
+.album-card.is-playing .album-card__player { display: block; }
+
+.album-card__player iframe {
+  display: block;
+  width: 100%;
+  height: 120px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--color-white);
+  box-shadow: 0 6px 16px rgba(0, 8, 49, 0.14);
+}
