@@ -1,11 +1,60 @@
-- band: Aksak Maboul
-  album: Un Caïd
-  label: Records Records
+- band: "Khalab "
+  album: I Need A Modem (Nihiloxica Remix)
+  label: Crammed Discs
+  year: "2024"
+  image: /assets/images/uploads/a4192820731x1700.jpg
+  link: https://djkhalab.bandcamp.com/track/i-need-a-modem-feat-kasai-allstars-nihiloxica-remix
+- band: Gue Gue (pq & Spooky-J Remix)
+  album: Du Matin
+  label: GueGue Disque
+  year: "2024"
+  image: /assets/images/uploads/ab67616d0000b273332f5e3a388444950670b6f7.jpeg
+  link: https://open.spotify.com/track/1MJWmiiDr2lmxSbD7Fo9EC?si=c92220ff5d584027
+- band: "Markus & Shahzad "
+  album: Nabi Ka (Spooky-J Remix)
+  label: Dionysiac Tour
+  year: "2021"
+  image: /assets/images/uploads/375x375bb.jpg
+  link: https://open.spotify.com/track/34dGvvO946LcZpvKbkiGLj?si=1df2743576284514
+- band: Kasai Allstars
+  album: Bird Women Baby (Spooky-J Remix)
+  label: Crammed Discs
+  year: "2021"
+  image: /assets/images/uploads/a22654390591x1700.jpg
+  link: https://kasaiallstars.bandcamp.com/track/bird-woman-baby-spooky-j-remix
+- band: "Nihiloxica "
+  album: Busoga (Spooky-J Drum Appreciation Fix)
+  label: Crammed Discs
+  year: "2021"
+  image: /assets/images/uploads/a19973484021x1700.jpg
+  link: https://nihiloxica.bandcamp.com/track/busoga-spooky-js-drum-appreciation-fix
+- band: "Aksak Maboul "
+  album: Un Caïd (Spooky-J Remix)
+  label: Crammed Discs
   year: "2025"
   image: /assets/images/uploads/a274289542410.jpg
   link: https://aksakmaboul.bandcamp.com/track/un-ca-d-spooky-j-remix
-- band: "Khalab "
-  album: "I Need A Modem "
-  label: Crammed Discs
-  year: "2024"
-  link: https://djkhalab.bandcamp.com/album/i-need-a-modem
+- band: "Petbrick "
+  album: Roadkill Ruby (Spooky-J Remix)
+  label: Rocket Recordings
+  year: "2020"
+  image: /assets/images/uploads/a36905813451x1700.jpg
+  link: https://petbrick.bandcamp.com/track/roadkill-ruby-spooky-j-nihiloxica-remix
+- band: Veslemes -  -
+  album: I Know Where You Live Vangelis (Spooky-J Anti-Disco Rework)
+  label: Bryd Out
+  year: "2020"
+  image: /assets/images/uploads/a33195359401x1700.jpg
+  link: https://veslemes.bandcamp.com/track/i-know-where-you-live-vangelis-spooky-j-anti-disco-rework
+- band: "Mentrix "
+  album: Loyalty (Spooky-J Remix)
+  label: "House of Strength "
+  year: "2020"
+  image: /assets/images/uploads/a2422491701x1700.jpg
+  link: https://mentrix.bandcamp.com/track/loyalty-spooky-j-remix
+- band: Mentrix
+  album: "Nature (Spooky-J Remix) "
+  label: "House of Strength "
+  year: "2020"
+  image: /assets/images/uploads/a2422491701x1700-1.jpg
+  link: https://mentrix.bandcamp.com/track/nature-spooky-j-remix
