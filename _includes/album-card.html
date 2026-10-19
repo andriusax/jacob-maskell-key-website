@@ -1,21 +1,29 @@
-<a class="album-card" href="{{ include.link }}" target="_blank" rel="noopener noreferrer">
-  <div class="album-card__image" style="background-image: url('{{ include.image | relative_url }}');"></div>
+<div class="album-card{% if include.bc_id %} has-player{% endif %}"{% if include.bc_id %} data-bc-type="{{ include.bc_type | default: 'album' }}" data-bc-id="{{ include.bc_id }}"{% endif %}>
+  <a class="album-card__image" href="{{ include.link }}" target="_blank" rel="noopener noreferrer" aria-label="{{ include.band | strip }} – {{ include.album | strip }}" style="background-image: url('{{ include.image | relative_url }}');"></a>
   <div class="album-card__info">
     <div class="album-card__meta">
       <span class="label">{{ include.label }}</span>
       <span class="year">{{ include.year }}</span>
     </div>
     <div class="album-card__bottom">
-      <div class="album-card__titles">
+      <a class="album-card__titles" href="{{ include.link }}" target="_blank" rel="noopener noreferrer">
         <span class="album-card__band">{{ include.band }}</span>
         <span class="album-card__album">{{ include.album }}</span>
-      </div>
+      </a>
       <span class="listen-btn-slot">
-        <span class="listen-btn">
+        {% if include.bc_id %}
+        <button type="button" class="listen-btn" aria-label="Listen to {{ include.album | strip }}">
           <span class="listen-btn__icon"><i class="fa-solid fa-volume-high"></i></span>
           <span class="listen-btn__label">Listen</span>
-        </span>
+        </button>
+        {% else %}
+        <a class="listen-btn" href="{{ include.link }}" target="_blank" rel="noopener noreferrer">
+          <span class="listen-btn__icon"><i class="fa-solid fa-volume-high"></i></span>
+          <span class="listen-btn__label">Listen</span>
+        </a>
+        {% endif %}
       </span>
+      {% if include.bc_id %}<div class="album-card__player"></div>{% endif %}
     </div>
   </div>
-</a>
+</div>
