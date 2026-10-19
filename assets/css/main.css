@@ -1077,3 +1077,27 @@ button.listen-btn {
   background: var(--color-white);
   box-shadow: 0 6px 16px rgba(0, 8, 49, 0.14);
 }
+
+/* ---------------------------------------------
+   Home hero: discography cover carousel (right side)
+--------------------------------------------- */
+.hero-carousel {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.hero-carousel__slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.hero-carousel__slide.is-active { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-carousel__slide { transition: none; }
+}
