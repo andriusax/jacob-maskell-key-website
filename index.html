@@ -4,5 +4,44 @@ title: Home
 ---
 <section class="home-hero">
   <div class="home-hero__media home-hero__media--left" style="background-image: url('{{ site.data.home.hero_left | relative_url }}');"></div>
+  {% if site.data.home.hero_right_carousel == false %}
   <div class="home-hero__media home-hero__media--right" style="background-image: url('{{ site.data.home.hero_right | relative_url }}');"></div>
+  {% else %}
+  {% comment %} Right side: cycles through every Discography cover, links to the Discography page {% endcomment %}
+  <a class="home-hero__media home-hero__media--right hero-carousel" href="{{ '/discography/' | relative_url }}" aria-label="Discography">
+    {% assign first_done = false %}
+    {% for album in site.data.discography %}{% if album.image and album.image != "" %}
+    <span class="hero-carousel__slide{% unless first_done %} is-active{% endunless %}" {% unless first_done %}style="background-image: url('{{ album.image | relative_url }}');"{% else %}data-bg="{{ album.image | relative_url }}"{% endunless %}></span>
+    {% assign first_done = true %}
+    {% endif %}{% endfor %}
+  </a>
+  {% endif %}
 </section>
+
+<script>
+  // Crossfade through the discography covers. Images after the first are
+  // loaded one step ahead, so the homepage doesn't download them all at once.
+  (function () {
+    var box = document.querySelector('.hero-carousel');
+    if (!box) return;
+    var slides = box.querySelectorAll('.hero-carousel__slide');
+    if (slides.length < 2) return;
+    var i = 0;
+    var INTERVAL = 3000;
+    function load(s) {
+      if (s.dataset.bg) {
+        s.style.backgroundImage = "url('" + s.dataset.bg + "')";
+        s.removeAttribute('data-bg');
+      }
+    }
+    load(slides[1]);
+    setInterval(function () {
+      if (document.hidden) return;
+      slides[i].classList.remove('is-active');
+      i = (i + 1) % slides.length;
+      load(slides[i]);
+      slides[i].classList.add('is-active');
+      load(slides[(i + 1) % slides.length]);
+    }, INTERVAL);
+  })();
+</script>
