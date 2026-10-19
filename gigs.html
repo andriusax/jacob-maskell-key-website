@@ -13,7 +13,8 @@ permalink: /gigs/
 </section>
 
 <section class="gig-list" id="gig-list">
-  {% for gig in site.data.gigs %}
+  {% assign sorted_gigs = site.data.gigs | sort: "date" | reverse %}
+  {% for gig in sorted_gigs %}
     {% include gig-row.html date=gig.date city=gig.city venue=gig.venue project=gig.project link=gig.link %}
   {% endfor %}
 </section>
@@ -22,6 +23,9 @@ permalink: /gigs/
   (function () {
     var buttons = document.querySelectorAll('.gigs-toggle button');
     var rows = document.querySelectorAll('.gig-row');
+    var list = document.getElementById('gig-list');
+    // keep upcoming gigs soonest-first at the top; past gigs stay newest-first
+    Array.prototype.filter.call(rows, function (r) { return r.dataset.status === 'upcoming'; }).forEach(function (r) { list.insertBefore(r, list.firstChild); });
     var FADE_MS = 220;
     var currentFilter = null;
 
