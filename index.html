@@ -7,7 +7,7 @@ title: Home
   {% if site.data.home.hero_right_carousel == false %}
   <div class="home-hero__media home-hero__media--right" style="background-image: url('{{ site.data.home.hero_right | relative_url }}');"></div>
   {% else %}
-  {% comment %} Right side: cycles through every Discography cover, links to the Discography page {% endcomment %}
+  {% comment %} Right side: cycles through every Discography cover in random order, links to the Discography page {% endcomment %}
   <a class="home-hero__media home-hero__media--right hero-carousel" href="{{ '/discography/' | relative_url }}" aria-label="Discography">
     {% assign first_done = false %}
     {% for album in site.data.discography %}{% if album.image and album.image != "" %}
@@ -19,29 +19,63 @@ title: Home
 </section>
 
 <script>
-  // Crossfade through the discography covers. Images after the first are
-  // loaded one step ahead, so the homepage doesn't download them all at once.
+  // Crossfade through the discography covers in a random order (new order on
+  // every visit). Images are loaded one step ahead, so the homepage doesn't
+  // download them all at once.
   (function () {
     var box = document.querySelector('.hero-carousel');
     if (!box) return;
     var slides = box.querySelectorAll('.hero-carousel__slide');
-    if (slides.length < 2) return;
-    var i = 0;
+    var n = slides.length;
+    if (n < 2) return;
     var INTERVAL = 3000;
+
     function load(s) {
       if (s.dataset.bg) {
         s.style.backgroundImage = "url('" + s.dataset.bg + "')";
         s.removeAttribute('data-bg');
       }
     }
-    load(slides[1]);
+
+    function shuffle(avoidFirst) {
+      var a = [];
+      for (var k = 0; k < n; k++) a.push(k);
+      for (var j = n - 1; j > 0; j--) {
+        var r = Math.floor(Math.random() * (j + 1));
+        var tmp = a[j]; a[j] = a[r]; a[r] = tmp;
+      }
+      // don't show the same cover twice in a row when a new round starts
+      if (avoidFirst !== undefined && a[0] === avoidFirst) { a.push(a.shift()); }
+      return a;
+    }
+
+    var order = shuffle();
+    var pos = 0;
+
+    // Swap the server-rendered first cover for a random one, without a fade.
+    var first = slides[order[0]];
+    load(first);
+    if (first !== slides[0]) {
+      slides[0].style.transition = 'none';
+      first.style.transition = 'none';
+      slides[0].classList.remove('is-active');
+      first.classList.add('is-active');
+      setTimeout(function () {
+        slides[0].style.transition = '';
+        first.style.transition = '';
+      }, 50);
+    }
+    load(slides[order[1]]);
+
     setInterval(function () {
       if (document.hidden) return;
-      slides[i].classList.remove('is-active');
-      i = (i + 1) % slides.length;
-      load(slides[i]);
-      slides[i].classList.add('is-active');
-      load(slides[(i + 1) % slides.length]);
+      var current = order[pos];
+      slides[current].classList.remove('is-active');
+      pos++;
+      if (pos >= n) { order = shuffle(current); pos = 0; }
+      load(slides[order[pos]]);
+      slides[order[pos]].classList.add('is-active');
+      load(slides[order[(pos + 1) % n]]);
     }, INTERVAL);
   })();
 </script>
