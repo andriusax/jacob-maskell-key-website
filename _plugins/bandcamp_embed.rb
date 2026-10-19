@@ -1,5 +1,8 @@
 # Looks up the Bandcamp album/track number for every Discography and Remixes
 # entry at build time, so the cards can show an inline Bandcamp player.
+# Spotify links (track/album/playlist) get an inline Spotify player instead;
+# those are stored as bandcamp_type "spotify-<kind>" so the card markup
+# stays the same.
 # Nothing to fill in by hand: paste the normal Bandcamp link in Pages CMS and
 # the player appears on the next build. If a lookup fails (or the link isn't
 # Bandcamp), the card simply falls back to linking out, as before.
@@ -13,6 +16,12 @@ require "cgi"
 module BandcampEmbed
   CACHE = {}
   LINK = %r{\Ahttps?://[^/\s]*bandcamp\.com/(album|track)/}i
+  SPOTIFY = %r{\Ahttps?://open\.spotify\.com/(?:intl-[a-z-]+/)?(track|album|playlist|episode)/([A-Za-z0-9]+)}i
+
+  def self.spotify(url)
+    return nil unless url.is_a?(String) && (m = url.strip.match(SPOTIFY))
+    { "type" => "spotify-#{m[1].downcase}", "id" => m[2] }
+  end
 
   def self.lookup(url)
     return nil unless url.is_a?(String) && url.strip =~ LINK
@@ -69,7 +78,7 @@ module Jekyll
             item["bandcamp_type"] = "album" if item["bandcamp_type"].to_s.strip == ""
             next
           end
-          info = BandcampEmbed.lookup(item["link"])
+          info = BandcampEmbed.spotify(item["link"]) || BandcampEmbed.lookup(item["link"])
           next unless info
           item["bandcamp_type"] = info["type"]
           item["bandcamp_id"] = info["id"]
