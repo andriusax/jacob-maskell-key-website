@@ -1,0 +1,23 @@
+<script>
+  // Listen button on a card: swap it for an inline Bandcamp player.
+  // The player is only created on click, so the page doesn't load 20 iframes up front.
+  (function () {
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('.album-card.has-player .listen-btn');
+      if (!btn) return;
+      e.preventDefault();
+      var card = btn.closest('.album-card');
+      var slot = card.querySelector('.album-card__player');
+      if (!slot.firstChild) {
+        var frame = document.createElement('iframe');
+        frame.src = 'https://bandcamp.com/EmbeddedPlayer/' + card.dataset.bcType + '=' + card.dataset.bcId +
+          '/size=large/bgcol=ffffff/linkcol=000831/tracklist=false/artwork=none/transparent=true/';
+        frame.title = 'Bandcamp player';
+        frame.setAttribute('seamless', '');
+        frame.setAttribute('allow', 'autoplay');
+        slot.appendChild(frame);
+      }
+      card.classList.add('is-playing');
+    });
+  })();
+</script>
