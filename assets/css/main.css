@@ -1143,3 +1143,19 @@ button.listen-btn {
 @media (max-width: 760px) {
   .home-gigs { margin: 0 auto 48px; }
 }
+
+/* ---------------------------------------------
+   Gig rows: fixed-width date column so every city/venue
+   lines up, however long the date is (e.g. "29 Dec" vs "3 Jan")
+--------------------------------------------- */
+.gig-row__col {
+  flex: 0 0 64px;
+  width: 64px;
+}
+
+.gig-row__date,
+.gig-row__year { white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .gig-row__col { flex-basis: 56px; width: 56px; }
+}
