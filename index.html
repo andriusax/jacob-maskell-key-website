@@ -18,6 +18,35 @@ title: Home
   {% endif %}
 </section>
 
+{% if site.data.home.show_upcoming_gigs != false %}
+{% comment %} Next 3 upcoming gigs from the Gigs list. Past gigs drop off automatically on the daily rebuild; the section hides itself when nothing is coming up. {% endcomment %}
+{% assign today_day = site.time | date: "%Y%m%d" | plus: 0 %}
+{% assign gigs_url = '/gigs/' | relative_url %}
+{% assign upcoming_count = 0 %}
+{% assign gigs_sorted = site.data.gigs | sort: "date" %}
+{% capture upcoming_rows %}
+  {% for gig in gigs_sorted %}
+    {% assign gig_day = gig.date | date: "%Y%m%d" | plus: 0 %}
+    {% if gig_day >= today_day and upcoming_count < 3 %}
+      {% assign upcoming_count = upcoming_count | plus: 1 %}
+      {% assign gig_link = gig.link | default: gigs_url %}
+      {% include gig-row.html date=gig.date city=gig.city venue=gig.venue project=gig.project link=gig_link %}
+    {% endif %}
+  {% endfor %}
+{% endcapture %}
+{% if upcoming_count > 0 %}
+<section class="home-gigs" aria-labelledby="home-gigs-title">
+  <div class="home-gigs__header">
+    <h2 class="home-gigs__title" id="home-gigs-title">Upcoming</h2>
+    <a class="home-gigs__all" href="{{ gigs_url }}">All gigs →</a>
+  </div>
+  <div class="gig-list">
+    {{ upcoming_rows }}
+  </div>
+</section>
+{% endif %}
+{% endif %}
+
 <script>
   // Crossfade through the discography covers in a random order (new order on
   // every visit). Images are loaded one step ahead, so the homepage doesn't
