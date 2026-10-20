@@ -1101,3 +1101,45 @@ button.listen-btn {
 @media (prefers-reduced-motion: reduce) {
   .hero-carousel__slide { transition: none; }
 }
+
+/* ---------------------------------------------
+   Home: upcoming gigs strip under the hero
+   (reuses the .gig-row styling from the Gigs page)
+--------------------------------------------- */
+.home-gigs {
+  width: min(948px, 100%);
+  margin: -32px auto 96px;
+}
+
+.home-gigs__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.home-gigs__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--size-title);
+  line-height: var(--line-title);
+  color: var(--color-heading);
+}
+
+.home-gigs__all {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--size-body);
+  line-height: var(--line-body);
+  color: var(--color-link);
+}
+
+.home-gigs__all:hover { text-decoration: underline; }
+
+.home-gigs .gig-list { padding-bottom: 0; }
+
+@media (max-width: 760px) {
+  .home-gigs { margin: 0 auto 48px; }
+}
