@@ -16,6 +16,7 @@ content:
       - { name: hero_left, type: image, label: "Left Hero Media (gif or image)" }
       - { name: hero_right, type: image, label: "Right Hero Media (gif or image)" }
       - { name: hero_right_carousel, type: boolean, label: "Right Hero: Discography Carousel", description: "On: cycles through all Discography covers (links to the Discography page). Off: shows the Right Hero Media image instead.", default: true }
+      - { name: show_upcoming_gigs, type: boolean, label: "Show Upcoming Gigs", description: "On: shows your next 3 upcoming gigs (from the Gigs page) under the hero images. Hides automatically when nothing is coming up.", default: true }
 
   - name: about
     label: About
