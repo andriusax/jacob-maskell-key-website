@@ -1,16 +1,18 @@
 - name: Nihiloxica
   image: /assets/images/uploads/whatsapp-image-2026-10-17-at-103015.jpeg
-  link: https://www.youtube.com/watch?v=tIO3uxKiB5I&t=8s
+  video: https://www.youtube.com/watch?v=tIO3uxKiB5I&t=8s
 - name: AWICHAS
   image: /assets/images/uploads/rewire202604122143-awichas-sabine-van-nistelrooij3000.jpg
-  link: https://www.youtube.com/watch?v=KFOdheuCRuU
+  video: https://www.youtube.com/watch?v=KFOdheuCRuU
 - name: Band Photo
   image: /assets/images/uploads/whatsapp-2026-10-14-2464x1463.jpg
-  link: https://www.youtube.com/watch?v=0SsVyjRL7BY&list=PLnfEGuCi6vW01WUdW5a5LQjNI5yOBVHvc
+  video: https://www.youtube.com/watch?v=0SsVyjRL7BY&list=PLnfEGuCi6vW01WUdW5a5LQjNI5yOBVHvc
 - name: Spooky-J
   image: /assets/images/uploads/spooky-j-cover-2464x1463.jpg
   link: https://www.instagram.com/reels/C48HvadsFDU/
 - name: Dis Fig x Spooky-J
+  gig_names:
+    - Dis Fig
   image: /assets/images/uploads/26ctm2025byfrankiecasillo1200.jpg
   link: https://www.instagram.com/p/DTBE-iXDc7K/?utm_source=ig_web_copy_link&cplk=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==
 - name: Hot In Da Club
