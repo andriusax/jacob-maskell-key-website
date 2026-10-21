@@ -1,4 +1,4 @@
-<a class="band-card" href="{{ include.link }}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+<a class="band-card" href="{{ include.link }}"{% unless include.internal %} target="_blank" rel="noopener noreferrer"{% endunless %} style="text-decoration: none;">
   <div class="band-card__image" style="background-image: url('{{ include.image | relative_url }}');"></div>
   <span class="band-card__name">{{ include.name }}</span>
   <hr>
