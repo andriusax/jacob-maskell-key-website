@@ -1,0 +1,78 @@
+---
+layout: default
+---
+{% assign project = page.project %}
+{% assign gigs_url = '/gigs/' | relative_url %}
+{% assign today_day = site.time | date: "%Y%m%d" | plus: 0 %}
+{% assign upcoming_count = 0 %}
+{% assign past_count = 0 %}
+{% for gig in page.gigs %}
+  {% assign gig_day = gig.date | date: "%Y%m%d" | plus: 0 %}
+  {% if gig_day >= today_day %}{% assign upcoming_count = upcoming_count | plus: 1 %}{% else %}{% assign past_count = past_count | plus: 1 %}{% endif %}
+{% endfor %}
+
+<section class="page-header project-header">
+  <a class="project-back" href="{{ '/live-projects/' | relative_url }}">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Live Projects
+  </a>
+  <h1 class="hero-display">{{ project.name }}</h1>
+</section>
+
+<section class="project-intro">
+  {% if page.video_id %}
+  <div class="video-card__media project-video">
+    <iframe src="https://www.youtube.com/embed/{{ page.video_id }}" title="{{ project.name | escape }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+  </div>
+  {% elsif project.image %}
+  <div class="band-card__image project-video" style="background-image: url('{{ project.image | relative_url }}');"></div>
+  {% endif %}
+
+  {% if project.description or page.external_link != "" %}
+  <div class="project-text">
+    {% if project.description %}{{ project.description | markdownify }}{% endif %}
+    {% if page.external_link != "" %}
+    <a class="project-link" href="{{ page.external_link }}" target="_blank" rel="noopener noreferrer">More from {{ project.name }}</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
+
+{% if upcoming_count > 0 %}
+<section class="project-gigs" aria-labelledby="project-upcoming">
+  <h2 class="project-gigs__title" id="project-upcoming">Upcoming</h2>
+  <div class="gig-list">
+    {% for gig in page.gigs %}
+      {% assign gig_day = gig.date | date: "%Y%m%d" | plus: 0 %}
+      {% if gig_day >= today_day %}
+        {% assign gig_link = gig.link | default: gigs_url %}
+        {% include gig-row.html date=gig.date city=gig.city venue=gig.venue project=gig.project link=gig_link %}
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if past_count > 0 %}
+<section class="project-gigs" aria-labelledby="project-past">
+  <h2 class="project-gigs__title" id="project-past">Past</h2>
+  <div class="gig-list">
+    {% assign past_gigs = page.gigs | reverse %}
+    {% for gig in past_gigs %}
+      {% assign gig_day = gig.date | date: "%Y%m%d" | plus: 0 %}
+      {% if gig_day < today_day %}
+        {% assign gig_link = gig.link | default: gigs_url %}
+        {% include gig-row.html date=gig.date city=gig.city venue=gig.venue project=gig.project link=gig_link %}
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<script>
+  // Links in the description open in a new tab, like on the About page.
+  document.querySelectorAll('.project-text a[href^="http"]').forEach(function (a) {
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+  });
+</script>
