@@ -130,4 +130,16 @@ content:
     fields:
       - { name: name, type: string, label: "Project Name" }
       - { name: image, type: image }
-      - { name: link, type: string, label: "Link" }
+      - name: description
+        label: Description
+        type: rich-text
+        description: "Shown on the project's own page. Select text and use the link button to add a hyperlink."
+        options:
+          format: markdown
+      - { name: video, type: string, label: "YouTube Video", description: "Paste the normal YouTube link. It's embedded on the project's page." }
+      - { name: link, type: string, label: "Extra Link (optional)", description: "Shown as a 'More from…' link on the project's page, e.g. Instagram or Bandcamp." }
+      - name: gig_names
+        type: string
+        label: "Gig names (optional)"
+        description: "Gigs whose Project starts with this project's name show up on its page automatically. Only fill this in if the gigs use a different name, e.g. 'Dis Fig' for Dis Fig x Spooky-J."
+        list: true
