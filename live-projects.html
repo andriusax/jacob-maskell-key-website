@@ -7,8 +7,9 @@ permalink: /live-projects/
   <h1 class="hero-display">Live Projects</h1>
 </section>
 
-<section style="padding-bottom: 64px;">
+<section class="project-grid">
   {% for project in site.data.live_projects %}
-    {% include band-card.html name=project.name image=project.image link=project.link %}
+    {% if project.url %}{% assign project_link = project.url | relative_url %}{% else %}{% assign project_link = project.link %}{% endif %}
+    {% include band-card.html name=project.name image=project.image link=project_link internal=project.url %}
   {% endfor %}
 </section>
