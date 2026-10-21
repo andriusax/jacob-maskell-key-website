@@ -1255,3 +1255,6 @@ button.listen-btn {
 @media (prefers-reduced-motion: reduce) {
   .project-grid .band-card__image { transition: none; }
 }
+/* Homepage photo with eyes that follow the cursor (_includes/hero-eyes.html) */
+.hero-eyes { overflow: hidden; }
+.hero-eyes svg { display: block; width: 100%; height: 100%; }
