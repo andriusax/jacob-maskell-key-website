@@ -1,16 +1,16 @@
 ---
-layout: default
-title: Remixes
+layout: null
 permalink: /remixes/
 ---
-<section class="page-header">
-  <h1 class="hero-display">Remixes</h1>
-</section>
-
-<section class="card-grid">
-  {% for remix in site.data.remixes %}
-    {% include album-card.html band=remix.band album=remix.album label=remix.label year=remix.year image=remix.image link=remix.link bc_type=remix.bandcamp_type bc_id=remix.bandcamp_id %}
-  {% endfor %}
-</section>
-
-{% include bandcamp-player.html %}
+{%- comment -%} Remixes now live at the bottom of the Discography page; old links land there. {%- endcomment -%}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Remixes | Jacob Maskell-Key</title>
+<link rel="canonical" href="{{ '/discography/#remixes' | absolute_url }}">
+<meta http-equiv="refresh" content="0; url={{ '/discography/#remixes' | relative_url }}">
+<script>location.replace("{{ '/discography/#remixes' | relative_url }}");</script>
+</head>
+<body><a href="{{ '/discography/#remixes' | relative_url }}">Remixes are now on the Discography page</a></body>
+</html>
