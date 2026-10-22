@@ -13,4 +13,14 @@ permalink: /discography/
   {% endfor %}
 </section>
 
+<section class="page-header" id="remixes">
+  <h2 class="hero-display">Remixes</h2>
+</section>
+
+<section class="card-grid">
+  {% for remix in site.data.remixes %}
+    {% include album-card.html band=remix.band album=remix.album label=remix.label year=remix.year image=remix.image link=remix.link bc_type=remix.bandcamp_type bc_id=remix.bandcamp_id %}
+  {% endfor %}
+</section>
+
 {% include bandcamp-player.html %}
