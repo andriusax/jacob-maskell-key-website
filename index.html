@@ -7,6 +7,7 @@ title: Home
   <div class="home-hero__media home-hero__media--left" style="background-image: url('{{ site.data.home.hero_left | relative_url }}');"></div>
   {% else %}
   {% include hero-eyes.html %}
+  {% include head-chase.html %}
   {% endif %}
   {% if site.data.home.hero_right_carousel == false %}
   <div class="home-hero__media home-hero__media--right" style="background-image: url('{{ site.data.home.hero_right | relative_url }}');"></div>
