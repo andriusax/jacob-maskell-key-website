@@ -4,10 +4,10 @@ title: Events
 permalink: /events/
 ---
 {% comment %}
-  Posters for events Jacob has organised, newest first, three to a row on
-  desktop and one on phones. Posters sit flush with no gaps; each row's
-  posters are sized to the same height so none of them get cropped (the
-  script below reads each poster's shape once it loads).
+  Posters for events Jacob has organised, newest first: three to a row on
+  desktop, one on phones, flush with no gaps. Every poster gets the same
+  4:5 tile; posters with a different shape are trimmed slightly at the edges.
+  A poster with a Link (set in Pages CMS) opens that website when clicked.
   Entries whose poster image isn't in the site yet are skipped.
 {% endcomment %}
 <section class="page-header">
@@ -15,35 +15,20 @@ permalink: /events/
 </section>
 
 {% assign sorted = site.data.events | sort: "date" | reverse %}
-{% assign events = "" | split: "" %}
-{% for e in sorted %}{% assign poster_file = site.static_files | where: "path", e.image | first %}{% if poster_file %}{% assign events = events | push: e %}{% endif %}{% endfor %}
 <section class="poster-grid" aria-label="Event posters">
-  {% for event in events %}
-    {% assign col = forloop.index0 | modulo: 3 %}
-    {% if col == 0 %}<div class="poster-row">{% endif %}
-    {% capture label %}{{ event.title }}{% if event.date %}, {{ event.date | date: "%-d %B %Y" }}{% endif %}{% if event.venue %}, {{ event.venue }}{% endif %}{% endcapture %}
-    {% if event.link and event.link != "" %}<a class="poster" href="{{ event.link }}" target="_blank" rel="noopener noreferrer">{% else %}<figure class="poster">{% endif %}
-      <img src="{{ event.image | relative_url }}" alt="Poster: {{ label | strip | escape }}" loading="{% if forloop.index <= 3 %}eager{% else %}lazy{% endif %}">
-      <span class="poster__caption">{{ event.title }}<br><span class="poster__meta">{{ event.date | date: "%-d %b %Y" }}{% if event.venue %} · {{ event.venue }}{% endif %}</span></span>
-    {% if event.link and event.link != "" %}</a>{% else %}</figure>{% endif %}
-    {% if col == 2 or forloop.last %}
-      {% if forloop.last and col < 2 %}{% for i in (col..1) %}<span class="poster poster--filler" aria-hidden="true"></span>{% endfor %}{% endif %}
+  {% for event in sorted %}
+    {% assign poster_file = site.static_files | where: "path", event.image | first %}
+    {% if poster_file %}
+      {% capture label %}{{ event.title | strip }}{% if event.date %}, {{ event.date | date: "%-d %B %Y" }}{% endif %}{% if event.venue %}, {{ event.venue }}{% endif %}{% endcapture %}
+      {% if event.link and event.link != "" %}
+      <a class="poster" href="{{ event.link }}" target="_blank" rel="noopener noreferrer">
+        <img src="{{ event.image | relative_url }}" alt="Poster: {{ label | escape }}" loading="{% if forloop.index <= 3 %}eager{% else %}lazy{% endif %}">
+      </a>
+      {% else %}
+      <div class="poster">
+        <img src="{{ event.image | relative_url }}" alt="Poster: {{ label | escape }}" loading="{% if forloop.index <= 3 %}eager{% else %}lazy{% endif %}">
       </div>
+      {% endif %}
     {% endif %}
   {% endfor %}
 </section>
-
-<script>
-  // Give each poster a share of its row that matches its shape, so every
-  // poster in a row ends up the same height and nothing is cropped.
-  (function () {
-    document.querySelectorAll('.poster img').forEach(function (img) {
-      function fit() {
-        if (img.naturalWidth && img.naturalHeight) {
-          img.closest('.poster').style.flexGrow = (img.naturalWidth / img.naturalHeight).toFixed(4);
-        }
-      }
-      if (img.complete) fit(); else img.addEventListener('load', fit);
-    });
-  })();
-</script>
