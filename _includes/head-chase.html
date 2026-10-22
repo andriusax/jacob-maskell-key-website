@@ -16,7 +16,7 @@
   .chomp-tab:focus-visible { outline: 2px solid #0b0f2e; outline-offset: 3px; }
   .chomp-tab[data-edge="left"] { left: 0; border-radius: 0 8px 8px 0; transform: translateX(-110%); }
   .chomp-tab[data-edge="right"] { right: 0; border-radius: 8px 0 0 8px; transform: translateX(110%); }
-  .chomp-tab[data-edge="bottom"] { bottom: env(safe-area-inset-bottom, 0px); border-radius: 8px 8px 0 0; transform: translateY(110%); }
+  .chomp-tab[data-edge="top"] { top: env(safe-area-inset-top, 0px); border-radius: 0 0 8px 8px; transform: translateY(-110%); }
   .chomp-tab.is-in { opacity: 1; transform: none; }
   .chomp-tab.is-in:hover { filter: brightness(1.08); }
   .chomp-head { position: fixed; left: 0; top: 0; z-index: 60; pointer-events: none; display: none; will-change: transform; transform-origin: 50% 60%; }
@@ -49,12 +49,12 @@
   document.body.appendChild(tab);
   var tabTimer = 0;
   function placeTab() {
-    var edges = ['left', 'right', 'bottom'];
+    var edges = ['left', 'right', 'top'];
     var edge = edges[Math.floor(Math.random() * edges.length)];
     tab.dataset.edge = edge;
     tab.textContent = LABELS[Math.floor(Math.random() * LABELS.length)];
     tab.style.top = ''; tab.style.left = '';
-    if (edge === 'bottom') tab.style.left = (10 + Math.random() * 75) + 'vw';
+    if (edge === 'top') tab.style.left = (10 + Math.random() * 75) + 'vw';
     else tab.style.top = (18 + Math.random() * 64) + 'vh';
     tab.classList.remove('is-in');
     clearTimeout(tabTimer);
