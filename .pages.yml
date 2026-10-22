@@ -79,6 +79,24 @@ content:
       - { name: project, type: string }
       - { name: link, type: string, label: "Ticket Link" }
 
+  - name: events
+    label: Events (posters)
+    type: file
+    path: _data/events.yml
+    format: yaml
+    list: true
+    fields:
+      - { name: title, type: string, label: "Event name" }
+      - name: date
+        type: date
+        label: "Date"
+        description: "The Events page is sorted by this date, newest first."
+        options:
+          format: yyyy-MM-dd
+      - { name: venue, type: string, label: "Venue" }
+      - { name: image, type: image, label: "Poster", description: "Events without a poster don't show on the page." }
+      - { name: link, type: string, label: "Link (optional)", description: "Tickets, RA or Instagram page. Clicking the poster opens it." }
+
   - name: music_videos
     label: Direction (Music Videos)
     type: file
