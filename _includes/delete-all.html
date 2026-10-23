@@ -1,0 +1,421 @@
+{% comment %}
+  "delete all" easter egg, triggered by the button in the navbar's Video column.
+  Jacob's head comes out (out of the homepage photo if it's on screen, otherwise
+  out of the button itself), flies around eating everything on the screen, then
+  throws it all back up and the page is back to normal. Nothing is really
+  deleted: elements are only moved with CSS transforms and their original
+  inline styles are put back at the end. Esc skips straight to the end.
+  Uses /assets/images/chomp-head.webp (the same cut-out head as head-chase.html).
+{% endcomment %}
+<style>
+  /* the "delete all" button in the navbar, dressed as a nav link; the spacer above it lines it up with Events/Press */
+  .navbar__spacer { visibility: hidden; }
+  .navbar__delete-all { appearance: none; background: none; border: 0; margin: 0; padding: 0; cursor: pointer; text-align: left;
+    font-family: var(--font-display); font-weight: 400; font-size: var(--size-body); line-height: var(--line-body); color: var(--color-link); }
+  .navbar__delete-all:hover { text-decoration: underline; }
+  .navbar__delete-all:focus-visible { outline: 2px solid var(--color-heading); outline-offset: 3px; }
+  .da-head { position: fixed; left: 0; top: 0; z-index: 70; pointer-events: none; display: none; will-change: transform; transform-origin: 43% 72%; }
+  .da-head img { position: absolute; left: 0; top: 0; width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none; }
+  .da-head .da-mouth { position: absolute; border-radius: 50%; overflow: hidden; background: radial-gradient(ellipse at 50% 35%, #5a0f12 0 40%, #240405 75%); }
+  .da-head .da-mouth::before, .da-head .da-mouth::after { content: ""; position: absolute; left: 6%; right: 6%; height: var(--da-teeth, 8px); z-index: 1;
+    background: repeating-linear-gradient(90deg, #fff8df 0 var(--da-tooth, 7px), #b9a97c var(--da-tooth, 7px) calc(var(--da-tooth, 7px) + 1.5px)); }
+  .da-head .da-mouth::before { top: 0; border-radius: 0 0 40% 40%; }
+  .da-head .da-mouth::after { bottom: 0; border-radius: 40% 40% 0 0; }
+  .da-ring { position: fixed; left: 0; top: 0; z-index: 68; pointer-events: none; border-radius: 50%; border: 10px solid #a8c43c; width: 40px; height: 40px; margin: -20px 0 0 -20px; }
+  .da-head .da-tongue { position: absolute; left: 22%; right: 22%; bottom: 8%; height: 45%; border-radius: 50% 50% 45% 45%; background: #b8454b; }
+  .da-shield { position: fixed; inset: 0; z-index: 65; touch-action: none; }
+  .da-word { position: fixed; z-index: 71; pointer-events: none; white-space: nowrap; font: 800 24px/1 var(--font-display, "Helvetica Neue", Helvetica, Arial, sans-serif); color: var(--color-link, #EA1B1B); opacity: 0; transition: opacity .2s, transform .7s; }
+  .da-drop { position: fixed; left: 0; top: 0; z-index: 69; pointer-events: none; border-radius: 50%; }
+  html.da-busy .chomp-tab { opacity: 0 !important; pointer-events: none; }
+</style>
+<script>
+(function () {
+  var btn = document.querySelector('[data-delete-all]');
+  if (!btn) return;
+  var HEAD_SRC = btn.getAttribute('data-head');
+  // The cut-out head is 272x431; where the lips meet, and where it sits in the 600x600 homepage photo
+  var HEAD = { w: 272, h: 431, mouthX: 118, mouthY: 312, photoX: 170, photoY: 85 };
+  var JAW_DROP = 0.13;
+  var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var DROP_COLOURS = ['#a8c43c', '#c9d65e', '#8d9e2c', '#d8c66a', '#b5b03a'];
+
+  var busy = false, skip = false, finished = true;
+  var items = [], waiters = [], extras = [];
+  var head, top, jaw, back, mouth, shield, headless = null, fromPhoto = false, photo = null;
+  var pos = { x: 0, y: 0 }, s0 = 1, s = 1, open = 0, tilt = 0, squash = 1, size = { w: 0, h: 0 };
+  var craze = 0.6, green = 0, puff = 1, shake = 0, wrapper = null, wrapperStyle = null;
+
+  var headImg = null;
+  function preload() { if (!headImg) { headImg = new Image(); headImg.src = HEAD_SRC; } return headImg; }
+  btn.addEventListener('pointerenter', preload);
+  btn.addEventListener('focus', preload);
+
+  // ---------- small timing helpers (all of them bail out instantly when skipped) ----------
+  function wait(ms) {
+    return new Promise(function (res) {
+      if (skip) return res();
+      var id = setTimeout(res, ms);
+      waiters.push(function () { clearTimeout(id); res(); });
+    });
+  }
+  function tween(ms, fn) {
+    return new Promise(function (res) {
+      if (skip) return res();
+      waiters.push(res);
+      var t0 = performance.now();
+      (function frame(now) {
+        if (skip) return res();
+        var p = Math.min(1, (now - t0) / ms);
+        fn(p);
+        if (p < 1) requestAnimationFrame(frame); else res();
+      })(t0);
+    });
+  }
+  function ease(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  // ---------- finding everything on screen ----------
+  function onScreen(r) { return r.width > 1 && r.height > 1 && r.bottom > 0 && r.right > 0 && r.top < innerHeight && r.left < innerWidth; }
+  var WHOLE = /^(IMG|SVG|VIDEO|IFRAME|CANVAS|A|BUTTON|INPUT|TEXTAREA|SELECT|LI|P|H1|H2|H3|H4|H5|H6|FIGURE|LABEL)$/;
+  function collect(el, out) {
+    var cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) return;
+    var r = el.getBoundingClientRect();
+    var kids = Array.prototype.filter.call(el.children, function (c) { return !/^(SCRIPT|STYLE|TEMPLATE|NOSCRIPT|BR)$/.test(c.tagName); });
+    // a box with its own background (a photo frame, a card) goes down in one piece, or it would leave a hole behind
+    var painted = cs.backgroundImage !== 'none' || !/rgba\(.*,\s*0\)|transparent/.test(cs.backgroundColor);
+    var whole = WHOLE.test(el.tagName.toUpperCase()) || !kids.length || (r.width <= 360 && r.height <= 360) ||
+                (painted && r.width * r.height < innerWidth * innerHeight * 0.6);
+    if (whole) { if (onScreen(r)) out.push(el); return; }
+    // a container that's too big to swallow in one go: eat its parts instead
+    kids.forEach(function (k) { collect(k, out); });
+  }
+  function collectAll() {
+    var out = [], root = document.querySelector('.wrapper') || document.body;
+    Array.prototype.forEach.call(root.children, function (c) { collect(c, out); });
+    return out.map(function (el) {
+      var r = el.getBoundingClientRect();
+      return { el: el, style: el.getAttribute('style'), inline: getComputedStyle(el).display === 'inline',
+               c: { x: r.left + r.width / 2, y: r.top + r.height / 2 }, eaten: false, spin: (Math.random() - 0.5) * 540 };
+    });
+  }
+
+  // ---------- the head ----------
+  function build() {
+    head = document.createElement('div'); head.className = 'da-head'; head.setAttribute('aria-hidden', 'true');
+    mouth = document.createElement('div'); mouth.className = 'da-mouth';
+    var tongue = document.createElement('div'); tongue.className = 'da-tongue'; mouth.appendChild(tongue);
+    back = new Image(); back.src = HEAD_SRC; back.alt = '';
+    jaw = new Image(); jaw.src = HEAD_SRC; jaw.alt = '';
+    top = new Image(); top.src = HEAD_SRC; top.alt = '';
+    head.appendChild(back); head.appendChild(mouth); head.appendChild(jaw); head.appendChild(top);
+    document.body.appendChild(head);
+  }
+  function layout() {
+    size.w = HEAD.w * s; size.h = HEAD.h * s;
+    head.style.width = size.w + 'px'; head.style.height = size.h + 'px';
+    var cut = HEAD.mouthY * s;
+    top.style.clipPath = 'inset(0 0 ' + (size.h - cut).toFixed(1) + 'px 0)';
+    jaw.style.clipPath = 'inset(' + cut.toFixed(1) + 'px 0 0 0)';
+    back.style.clipPath = 'inset(' + (cut - 1).toFixed(1) + 'px 0 0 0)';
+    back.style.transformOrigin = '50% ' + cut.toFixed(1) + 'px';
+    var mw = size.w * 0.42;
+    mouth.style.width = mw + 'px'; mouth.style.left = (HEAD.mouthX * s - mw / 2) + 'px'; mouth.style.top = (cut - 2) + 'px';
+    mouth.style.setProperty('--da-teeth', (9 * s).toFixed(1) + 'px');
+    mouth.style.setProperty('--da-tooth', (7 * s).toFixed(1) + 'px');
+  }
+  function draw() {
+    var o = open * size.h * JAW_DROP;
+    jaw.style.transform = 'translateY(' + o.toFixed(1) + 'px) rotate(' + (open * -3).toFixed(2) + 'deg)';
+    back.style.transform = 'scaleY(' + (1 + o / (size.h - HEAD.mouthY * s)).toFixed(4) + ')';
+    mouth.style.height = Math.max(0, o + 3) + 'px';
+    mouth.style.opacity = open > 0.02 ? 1 : 0;
+    // never quite still: a constant twitch, worse the crazier he gets
+    var j = (1.2 + 3 * craze) * s, jx = (Math.random() - 0.5) * j, jy = (Math.random() - 0.5) * j, jr = (Math.random() - 0.5) * 2.5 * craze;
+    head.style.filter = 'saturate(' + (1.5 - 0.4 * green).toFixed(2) + ') contrast(1.18) sepia(' + (0.6 * green).toFixed(2) + ') hue-rotate(' + (55 * green).toFixed(0) + 'deg)';
+    head.style.transform = 'translate(' + (pos.x + jx).toFixed(1) + 'px,' + (pos.y + jy).toFixed(1) + 'px) rotate(' + (tilt + jr).toFixed(2) + 'deg) scale(' + (squash * puff).toFixed(3) + ',' + squash.toFixed(3) + ')';
+  }
+  function mouthAt() { return { x: pos.x + HEAD.mouthX * s, y: pos.y + HEAD.mouthY * s + open * size.h * JAW_DROP / 2 }; }
+  function posForMouth(m) { return { x: m.x - HEAD.mouthX * s, y: m.y - HEAD.mouthY * s }; }
+  function photoHome() { var r = photo.getBoundingClientRect(); return { x: r.left + HEAD.photoX * s, y: r.top + HEAD.photoY * s }; }
+  function btnCentre() { var r = btn.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+
+  function flyTo(m, speed) {
+    var from = { x: pos.x, y: pos.y }, to = posForMouth(m);
+    var dx = to.x - from.x, dy = to.y - from.y, dist = Math.hypot(dx, dy);
+    var ms = clamp(dist / (speed || 1.5), 180, 650);
+    return tween(ms, function (p) {
+      var e = ease(p);
+      pos.x = from.x + dx * e; pos.y = from.y + dy * e;
+      tilt = clamp(dx / 30, -14, 14) * Math.sin(p * Math.PI);
+      open = 0.15 + 0.35 * Math.abs(Math.sin(p * Math.PI * 3));
+      draw();
+    });
+  }
+
+  // ---------- eating ----------
+  function swallow(it, m, ms, delay) {
+    var el = it.el;
+    it.eaten = true;
+    if (it.inline) el.style.display = 'inline-block';
+    el.style.transition = 'none';
+    el.style.transformOrigin = 'center';
+    void el.offsetWidth;
+    el.style.transition = 'transform ' + ms + 'ms cubic-bezier(.55,0,.9,.35) ' + (delay || 0) + 'ms, opacity ' + (ms * 0.5) + 'ms ease-in ' + ((delay || 0) + ms * 0.5) + 'ms';
+    el.style.transform = 'translate(' + (m.x - it.c.x).toFixed(1) + 'px,' + (m.y - it.c.y).toFixed(1) + 'px) scale(.03) rotate(' + it.spin.toFixed(0) + 'deg)';
+    el.style.opacity = '0';
+  }
+  function grow(total) {
+    var eaten = items.filter(function (it) { return it.eaten; }).length;
+    var m = mouthAt();
+    s = s0 * (1 + 0.5 * eaten / Math.max(1, total));
+    layout();
+    var p = posForMouth({ x: m.x, y: m.y - open * size.h * JAW_DROP / 2 }); pos.x = p.x; pos.y = p.y;
+  }
+  async function bite(list, total) {
+    await tween(110, function (p) { open = 0.3 + 0.8 * p; draw(); });
+    var m = mouthAt();
+    var spread = list.length > 1 ? Math.min(30, 300 / list.length) : 0;
+    list.forEach(function (it, i) { swallow(it, m, 300, i * spread); });
+    await wait(300 + spread * (list.length - 1));
+    grow(total);
+    await tween(240, function (p) { open = 1.1 * (1 - p); squash = 1 + 0.14 * Math.sin(p * Math.PI); draw(); });
+  }
+  function word(text, at, rise) {
+    var n = document.createElement('div'); n.className = 'da-word'; n.textContent = text;
+    n.style.left = (at.x - 30) + 'px'; n.style.top = (at.y - 40) + 'px';
+    document.body.appendChild(n); extras.push(n);
+    requestAnimationFrame(function () { n.style.opacity = 1; n.style.transform = 'translateY(' + (-(rise || 30)) + 'px)'; });
+    setTimeout(function () { n.style.opacity = 0; }, 800);
+    setTimeout(function () { n.remove(); }, 1400);
+  }
+
+  // ---------- throwing up ----------
+  function spray(m, count, power) {
+    var drops = [];
+    for (var i = 0; i < count; i++) {
+      var d = document.createElement('div'); d.className = 'da-drop';
+      var r = (6 + Math.random() * Math.random() * 26) * Math.max(s, 0.7);
+      d.style.width = r + 'px'; d.style.height = (r * (0.7 + Math.random() * 0.6)) + 'px';
+      d.style.borderRadius = (40 + Math.random() * 20) + '% ' + (40 + Math.random() * 20) + '% ' + (40 + Math.random() * 20) + '% ' + (40 + Math.random() * 20) + '%';
+      d.style.background = DROP_COLOURS[i % DROP_COLOURS.length];
+      document.body.appendChild(d); extras.push(d);
+      // mostly forwards and downwards out of the mouth, but some of it goes everywhere
+      var a = Math.random() < 0.7 ? Math.PI / 2 + (Math.random() - 0.5) * 2.4 : Math.random() * Math.PI * 2;
+      var v = (6 + Math.random() * 22) * (power || 1);
+      drops.push({ d: d, x: m.x, y: m.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 6, r: r, life: 0, spin: (Math.random() - 0.5) * 30, rot: 0 });
+    }
+    var last = performance.now();
+    (function frame(now) {
+      var dt = Math.min(32, now - last) / 16.67; last = now;
+      var alive = false;
+      drops.forEach(function (o) {
+        o.vy += 0.6 * dt; o.vx *= Math.pow(0.985, dt); o.x += o.vx * dt; o.y += o.vy * dt; o.life += dt; o.rot += o.spin * dt;
+        var a = Math.max(0, 1 - o.life / 90);
+        o.d.style.transform = 'translate(' + (o.x - o.r / 2).toFixed(1) + 'px,' + (o.y - o.r / 2).toFixed(1) + 'px) rotate(' + o.rot.toFixed(0) + 'deg)';
+        o.d.style.opacity = a;
+        if (a > 0 && o.y < innerHeight + 60) alive = true;
+      });
+      if (alive && !skip) requestAnimationFrame(frame); else drops.forEach(function (o) { o.d.remove(); });
+    })(last);
+  }
+  function shockwave(m) {
+    var ring = document.createElement('div'); ring.className = 'da-ring';
+    ring.style.transform = 'translate(' + m.x + 'px,' + m.y + 'px) scale(.2)';
+    document.body.appendChild(ring); extras.push(ring);
+    void ring.offsetWidth;
+    ring.style.transition = 'transform .6s cubic-bezier(.1,.8,.3,1), opacity .6s ease-out';
+    ring.style.transform = 'translate(' + m.x + 'px,' + m.y + 'px) scale(' + (Math.max(innerWidth, innerHeight) / 18).toFixed(1) + ')';
+    ring.style.opacity = '0';
+    setTimeout(function () { ring.remove(); }, 700);
+  }
+  function shakePage(amount) {
+    if (!wrapper) return;
+    if (amount < 0.3) { wrapper.style.transform = ''; return; }
+    wrapper.style.transform = 'translate(' + ((Math.random() - 0.5) * amount).toFixed(1) + 'px,' + ((Math.random() - 0.5) * amount).toFixed(1) + 'px)';
+  }
+  async function throwUp() {
+    var m = mouthAt();
+    var order = items.slice().sort(function () { return Math.random() - 0.5; });
+    // put everything back in the mouth first, then blast it all home at once
+    order.forEach(function (it) {
+      it.el.style.transition = 'none';
+      it.el.style.transform = 'translate(' + (m.x - it.c.x).toFixed(1) + 'px,' + (m.y - it.c.y).toFixed(1) + 'px) scale(.03) rotate(' + (-it.spin * 2).toFixed(0) + 'deg)';
+    });
+    void document.body.offsetWidth;
+    var gap = Math.min(5, 200 / Math.max(1, order.length));
+    order.forEach(function (it, i) {
+      var orig = document.createElement('div');
+      if (it.style) orig.setAttribute('style', it.style);
+      it.el.style.transition = 'transform 520ms cubic-bezier(.12,1.6,.3,1) ' + (i * gap).toFixed(0) + 'ms, opacity 60ms linear ' + (i * gap).toFixed(0) + 'ms';
+      it.el.style.transform = orig.style.transform || '';
+      it.el.style.opacity = orig.style.opacity || '';
+    });
+    shockwave(m);
+    spray(m, 140, 1.3);
+    var bursts = 0, burstTimer = setInterval(function () {
+      if (skip || ++bursts > 8) return clearInterval(burstTimer);
+      spray(mouthAt(), 22, 1 - bursts * 0.08);
+    }, 90);
+    var from = { x: pos.x, y: pos.y };
+    await tween(order.length * gap + 900, function (p) {
+      // the blast knocks him back, then he hangs there retching
+      var kick = Math.sin(Math.min(1, p * 4) * Math.PI) * (1 - p);
+      pos.y = from.y - 50 * s * kick; pos.x = from.x;
+      open = p < 0.8 ? 1.5 : 1.5 * (1 - (p - 0.8) / 0.2);
+      squash = 1 + 0.12 * Math.sin(p * Math.PI * 14) * (1 - p);
+      puff = 1 + 0.1 * (1 - p);
+      green = Math.max(0, 1 - p * 1.4);
+      craze = 1 - 0.4 * p;
+      tilt = -10 * kick;
+      shakePage(28 * (1 - p) * (1 - p));
+      draw();
+    });
+    shakePage(0); puff = 1;
+  }
+
+  // ---------- page lock while he's out ----------
+  function blockScroll(e) { e.preventDefault(); }
+  function onKey(e) {
+    if (e.key === 'Escape') { finish(); return; }
+    if ([' ', 'PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].indexOf(e.key) > -1) e.preventDefault();
+  }
+  function lock(on) {
+    document.documentElement.classList.toggle('da-busy', on);
+    var f = on ? 'addEventListener' : 'removeEventListener';
+    window[f]('wheel', blockScroll, { passive: false });
+    window[f]('touchmove', blockScroll, { passive: false });
+    window[f]('keydown', onKey);
+    if (on) { shield = document.createElement('div'); shield.className = 'da-shield'; document.body.appendChild(shield); }
+    else if (shield) { shield.remove(); shield = null; }
+  }
+
+  function finish() {
+    if (finished) return;
+    finished = true; skip = true;
+    waiters.splice(0).forEach(function (r) { r(); });
+    items.forEach(function (it) { if (it.style == null) it.el.removeAttribute('style'); else it.el.setAttribute('style', it.style); });
+    items = [];
+    extras.splice(0).forEach(function (n) { n.remove(); });
+    if (head) head.style.display = 'none';
+    if (wrapper) { if (wrapperStyle == null) wrapper.removeAttribute('style'); else wrapper.setAttribute('style', wrapperStyle); }
+    wrapper = null;
+    if (headless) headless.classList.remove('is-on');
+    headless = null;
+    lock(false);
+    busy = false;
+    try { btn.focus({ preventScroll: true }); } catch (e) {}
+  }
+
+  // ---------- the whole show ----------
+  async function run() {
+    var img = preload();
+    if (!img.complete) await new Promise(function (r) { img.onload = img.onerror = r; });
+    if (!img.naturalWidth) { busy = false; return; }
+    skip = false; finished = false; waiters = [];
+    lock(true);
+
+    photo = document.querySelector('.hero-eyes');
+    var hl = photo && photo.querySelector('.chomp-headless');
+    fromPhoto = !!(photo && onScreen(photo.getBoundingClientRect()) && !(hl && hl.classList.contains('is-on')));
+    if (fromPhoto) {
+      s0 = photo.getBoundingClientRect().width / 600;
+      if (hl) { headless = hl; headless.classList.add('is-on'); }
+    } else {
+      s0 = clamp(innerWidth * 0.2, 150, 230) / HEAD.w;
+    }
+    s = s0; craze = 0.6; green = 0; puff = 1;
+    wrapper = document.querySelector('.wrapper'); wrapperStyle = wrapper && wrapper.getAttribute('style');
+    items = collectAll();
+    if (!head) build();
+    layout(); head.style.display = 'block';
+
+    // out he comes
+    if (fromPhoto) {
+      var home = photoHome(); pos.x = home.x; pos.y = home.y; open = 0; squash = 1; tilt = 0; draw();
+      await tween(450, function (p) { pos.y = home.y - 70 * s * Math.sin(p * Math.PI / 2); tilt = 8 * Math.sin(p * Math.PI * 3) * (1 - p); draw(); });
+    } else {
+      var b = btnCentre(), p0 = posForMouth(b); pos.x = p0.x; pos.y = p0.y + size.h * 0.25; tilt = 0;
+      await tween(450, function (p) { squash = Math.max(0.01, 1 - Math.pow(1 - p, 3) * (1 - 0.01) + 0.15 * Math.sin(p * Math.PI)); pos.y = p0.y + size.h * 0.25 * (1 - p); open = 0.6 * Math.sin(p * Math.PI); draw(); });
+      squash = 1;
+    }
+    await wait(250);
+
+    // eat his way around the screen, nearest thing first
+    var total = items.length, R = 150, stops = 0;
+    while (!skip) {
+      var left = items.filter(function (it) { return !it.eaten; });
+      if (!left.length) break;
+      var m = mouthAt();
+      if (stops >= 12) {
+        // getting full: hoover up whatever's left from the middle of the screen
+        await flyTo({ x: innerWidth / 2, y: innerHeight * 0.5 }, 1.6);
+        if (skip) break;
+        left.sort(function (a, b) { return Math.hypot(a.c.x - m.x, a.c.y - m.y) - Math.hypot(b.c.x - m.x, b.c.y - m.y); });
+        await bite(left, total);
+        break;
+      }
+      left.sort(function (a, b) { return Math.hypot(a.c.x - m.x, a.c.y - m.y) - Math.hypot(b.c.x - m.x, b.c.y - m.y); });
+      var target = left[0];
+      await flyTo(target.c);
+      if (skip) break;
+      var here = mouthAt(), reach = R * Math.max(s, 0.8);
+      var mouthful = left.filter(function (it) { return it === target || Math.hypot(it.c.x - here.x, it.c.y - here.y) < reach; });
+      await bite(mouthful, total);
+      if (stops % 3 === 1) word('nom', here);
+      stops++; R *= 1.12;
+    }
+    if (skip) return;
+
+    // full, queasy, and here it comes
+    await wait(300);
+    await flyTo({ x: innerWidth / 2, y: innerHeight * 0.42 }, 0.8);
+    // turns green, cheeks puff out, shaking harder and harder...
+    await tween(1100, function (p) {
+      green = p; craze = 0.6 + 0.4 * p;
+      tilt = Math.sin(p * Math.PI * 7) * 8 * p;
+      puff = 1 + 0.16 * Math.sin(Math.min(1, p * 1.2) * Math.PI / 2) + 0.03 * Math.sin(p * Math.PI * 16);
+      squash = 1 + Math.sin(p * Math.PI * 11) * 0.05 * p;
+      open = 0;
+      shakePage(6 * p * p);
+      draw();
+    });
+    await throwUp();
+    craze = 0.6; green = 0;
+    if (skip) return;
+    await wait(350);
+
+    // back home
+    if (fromPhoto) {
+      s = s0; layout();
+      var from = { x: pos.x, y: pos.y, tilt: tilt };
+      await tween(700, function (p) {
+        var h = photoHome(), e = 1 - Math.pow(1 - p, 3);
+        pos.x = from.x + (h.x - from.x) * e; pos.y = from.y + (h.y - from.y) * e - Math.sin(p * Math.PI) * 60;
+        tilt = from.tilt * (1 - e); open = 0; squash = 1; draw();
+      });
+    } else {
+      var target2 = posForMouth(btnCentre()), from2 = { x: pos.x, y: pos.y };
+      await tween(600, function (p) {
+        var e = ease(p);
+        pos.x = from2.x + (target2.x - from2.x) * e; pos.y = from2.y + (target2.y - from2.y) * e;
+        squash = Math.max(0.01, 1 - e); open = 0; tilt = 20 * e; draw();
+      });
+    }
+    finish();
+  }
+
+  btn.addEventListener('click', function () {
+    if (busy) return;
+    busy = true;
+    if (reduceMotion) {
+      // no flying heads: just blank the page for a moment and bring it back
+      var root = document.querySelector('main') || document.body;
+      root.style.transition = 'opacity .3s'; root.style.opacity = '0';
+      setTimeout(function () { root.style.opacity = ''; setTimeout(function () { root.style.transition = ''; busy = false; }, 350); }, 900);
+      return;
+    }
+    run();
+  });
+})();
+</script>
