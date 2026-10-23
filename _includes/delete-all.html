@@ -1,11 +1,17 @@
 {% comment %}
   "delete all" easter egg, triggered by the button in the navbar's Video column.
-  Jacob's head comes out (out of the homepage photo if it's on screen, otherwise
-  out of the button itself), flies around eating everything on the screen, then
-  throws it all back up and the page is back to normal. Nothing is really
-  deleted: elements are only moved with CSS transforms and their original
-  inline styles are put back at the end. Esc skips straight to the end.
-  Uses /assets/images/chomp-head.webp (the same cut-out head as head-chase.html).
+  Jacob's face stays where it is in the homepage photo (eyes still following the
+  cursor until they roll back to white) and his mouth slowly unhinges into a
+  huge toothless hole: the jaw drops far too far and the lips stretch, and
+  everything on the screen is sucked into it in a spiral. After a moment of
+  silence he retches it all back out and his face settles back to normal.
+
+  The photo is warped live on a canvas laid over the lower half of the photo
+  (the eyes above it are untouched, so they keep following the cursor). The
+  mouth position is measured from this specific photo, like the eyes. On pages
+  without the photo, the face appears in the middle of the screen instead.
+  Nothing is really deleted: elements are only moved with CSS transforms and
+  their original inline styles are put back at the end. Esc skips to the end.
 {% endcomment %}
 <style>
   /* the "delete all" button in the navbar, dressed as a nav link; the spacer above it lines it up with Events/Press */
@@ -14,41 +20,47 @@
     font-family: var(--font-display); font-weight: 400; font-size: var(--size-body); line-height: var(--line-body); color: var(--color-link); }
   .navbar__delete-all:hover { text-decoration: underline; }
   .navbar__delete-all:focus-visible { outline: 2px solid var(--color-heading); outline-offset: 3px; }
-  .da-head { position: fixed; left: 0; top: 0; z-index: 70; pointer-events: none; display: none; will-change: transform; transform-origin: 43% 72%; }
-  .da-head img { position: absolute; left: 0; top: 0; width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none; }
-  .da-head .da-mouth { position: absolute; border-radius: 50%; overflow: hidden; background: radial-gradient(ellipse at 50% 35%, #5a0f12 0 40%, #240405 75%); }
-  .da-head .da-mouth::before, .da-head .da-mouth::after { content: ""; position: absolute; left: 6%; right: 6%; height: var(--da-teeth, 8px); z-index: 1;
-    background: repeating-linear-gradient(90deg, #fff8df 0 var(--da-tooth, 7px), #b9a97c var(--da-tooth, 7px) calc(var(--da-tooth, 7px) + 1.5px)); }
-  .da-head .da-mouth::before { top: 0; border-radius: 0 0 40% 40%; }
-  .da-head .da-mouth::after { bottom: 0; border-radius: 40% 40% 0 0; }
-  .da-ring { position: fixed; left: 0; top: 0; z-index: 68; pointer-events: none; border-radius: 50%; border: 10px solid #a8c43c; width: 40px; height: 40px; margin: -20px 0 0 -20px; }
-  .da-head .da-tongue { position: absolute; left: 22%; right: 22%; bottom: 8%; height: 45%; border-radius: 50% 50% 45% 45%; background: #b8454b; }
+
+  .da-face { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+  .da-face canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  /* hollowed, bruised eye sockets around the (still moving) eyes */
+  .da-sockets { position: absolute; inset: 0; mix-blend-mode: multiply; opacity: 0;
+    background:
+      radial-gradient(ellipse 6.5% 5% at 41.45% 47.4%, rgba(0,0,0,0) 0 38%, rgba(95,45,45,.55) 62%, rgba(0,0,0,0) 100%),
+      radial-gradient(ellipse 6.5% 5% at 57.65% 48.4%, rgba(0,0,0,0) 0 38%, rgba(95,45,45,.55) 62%, rgba(0,0,0,0) 100%); }
+  .da-marker { position: absolute; width: 1px; height: 1px; }
+  /* the face on pages without the homepage photo */
+  .da-standin { position: fixed; z-index: 66; left: 50%; top: 50%; width: min(70vmin, 420px); aspect-ratio: 1 / 1; transform: translate(-50%, -50%);
+    overflow: hidden; opacity: 0; transition: opacity .5s; box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+  .da-standin img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .da-shield { position: fixed; inset: 0; z-index: 65; touch-action: none; }
-  .da-word { position: fixed; z-index: 71; pointer-events: none; white-space: nowrap; font: 800 24px/1 var(--font-display, "Helvetica Neue", Helvetica, Arial, sans-serif); color: var(--color-link, #EA1B1B); opacity: 0; transition: opacity .2s, transform .7s; }
-  .da-drop { position: fixed; left: 0; top: 0; z-index: 69; pointer-events: none; border-radius: 50%; }
+  .da-drop { position: fixed; left: 0; top: 0; z-index: 72; pointer-events: none; }
+  /* text that has broken loose into flying letters leaves its box empty */
+  .da-textless { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; }
   html.da-busy .chomp-tab { opacity: 0 !important; pointer-events: none; }
 </style>
 <script>
 (function () {
   var btn = document.querySelector('[data-delete-all]');
   if (!btn) return;
-  var HEAD_SRC = btn.getAttribute('data-head');
-  // The cut-out head is 272x431; where the lips meet, and where it sits in the 600x600 homepage photo
-  var HEAD = { w: 272, h: 431, mouthX: 118, mouthY: 312, photoX: 170, photoY: 85 };
-  var JAW_DROP = 0.13;
+  var FACE_SRC = btn.getAttribute('data-face');
+
+  // Measured on the 600x600 homepage photo
+  var MX = 290, MY = 398;          // where his lips meet
+  var W0 = 41;                     // half the width of his mouth
+  var TOP = 318;                   // nothing above this line moves (the eyes live up there)
+  var X0 = 146, X1 = 434;          // the warp stays between these columns
   var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var DROP_COLOURS = ['#a8c43c', '#c9d65e', '#8d9e2c', '#d8c66a', '#b5b03a'];
+  // the outlines of his eyes in the photo (same as the cursor-following eyes use)
+  var EYE_L = new Path2D('M227.50 281.70 C228.33 280.62 230.93 278.95 233.30 277.70 C235.67 276.45 238.92 274.92 241.70 274.20 C244.48 273.48 247.23 273.30 250.00 273.40 C252.77 273.50 255.80 273.98 258.30 274.80 C260.80 275.62 262.92 277.07 265.00 278.30 C267.08 279.53 269.55 280.95 270.80 282.20 C272.05 283.45 273.18 284.68 272.50 285.80 C271.82 286.92 269.07 287.95 266.70 288.90 C264.33 289.85 261.37 290.90 258.30 291.50 C255.23 292.10 251.35 292.62 248.30 292.50 C245.25 292.38 242.63 291.68 240.00 290.80 C237.37 289.92 234.45 288.30 232.50 287.20 C230.55 286.10 229.13 285.12 228.30 284.20 C227.47 283.28 226.67 282.78 227.50 281.70 Z');
+  var EYE_R = new Path2D('M322.50 285.50 C323.47 284.40 327.37 283.38 330.00 282.60 C332.63 281.82 335.52 281.25 338.30 280.80 C341.08 280.35 343.92 279.87 346.70 279.90 C349.48 279.93 352.23 280.15 355.00 281.00 C357.77 281.85 360.80 283.37 363.30 285.00 C365.80 286.63 370.00 289.20 370.00 290.80 C370.00 292.40 365.80 293.37 363.30 294.60 C360.80 295.83 358.05 297.43 355.00 298.20 C351.95 298.97 348.05 299.27 345.00 299.20 C341.95 299.13 339.33 298.68 336.70 297.80 C334.07 296.92 331.28 295.33 329.20 293.90 C327.12 292.47 325.32 290.60 324.20 289.20 C323.08 287.80 321.53 286.60 322.50 285.50 Z');
+  var BILE = ['#1b0e0c', '#2b120f', '#3d1714', '#140808', '#4a1c17', '#24100d'];
 
   var busy = false, skip = false, finished = true;
   var items = [], waiters = [], extras = [];
-  var head, top, jaw, back, mouth, shield, headless = null, fromPhoto = false, photo = null;
-  var pos = { x: 0, y: 0 }, s0 = 1, s = 1, open = 0, tilt = 0, squash = 1, size = { w: 0, h: 0 };
-  var craze = 0.6, green = 0, puff = 1, shake = 0, wrapper = null, wrapperStyle = null;
-
-  var headImg = null;
-  function preload() { if (!headImg) { headImg = new Image(); headImg.src = HEAD_SRC; } return headImg; }
-  btn.addEventListener('pointerenter', preload);
-  btn.addEventListener('focus', preload);
+  var shield;
+  var face = null;     // { box, layer, canvas, ctx, sockets, marker, src, standin }
+  var open = 0, grade = 0, tremor = 0;
 
   // ---------- small timing helpers (all of them bail out instantly when skipped) ----------
   function wait(ms) {
@@ -65,216 +77,431 @@
       var t0 = performance.now();
       (function frame(now) {
         if (skip) return res();
-        var p = Math.min(1, (now - t0) / ms);
-        fn(p);
+        var p = Math.max(0, Math.min(1, (now - t0) / ms)); // rAF time can be a hair before t0
+        fn(p, now);
         if (p < 1) requestAnimationFrame(frame); else res();
       })(t0);
     });
   }
   function ease(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function smooth(a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function loadImage(src) {
+    return new Promise(function (res) { var i = new Image(); i.onload = function () { res(i); }; i.onerror = function () { res(null); }; i.src = src; });
+  }
 
-  // ---------- finding everything on screen ----------
+  // ---------- finding everything on screen (except the face itself) ----------
   function onScreen(r) { return r.width > 1 && r.height > 1 && r.bottom > 0 && r.right > 0 && r.top < innerHeight && r.left < innerWidth; }
   var WHOLE = /^(IMG|SVG|VIDEO|IFRAME|CANVAS|A|BUTTON|INPUT|TEXTAREA|SELECT|LI|P|H1|H2|H3|H4|H5|H6|FIGURE|LABEL)$/;
-  function collect(el, out) {
+  function collect(el, out, keep) {
+    if (keep && el === keep) return;
     var cs = getComputedStyle(el);
     if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) return;
     var r = el.getBoundingClientRect();
     var kids = Array.prototype.filter.call(el.children, function (c) { return !/^(SCRIPT|STYLE|TEMPLATE|NOSCRIPT|BR)$/.test(c.tagName); });
+    var holdsFace = keep && el.contains(keep);
     // a box with its own background (a photo frame, a card) goes down in one piece, or it would leave a hole behind
     var painted = cs.backgroundImage !== 'none' || !/rgba\(.*,\s*0\)|transparent/.test(cs.backgroundColor);
-    var whole = WHOLE.test(el.tagName.toUpperCase()) || !kids.length || (r.width <= 360 && r.height <= 360) ||
-                (painted && r.width * r.height < innerWidth * innerHeight * 0.6);
+    var whole = !holdsFace && (WHOLE.test(el.tagName.toUpperCase()) || !kids.length || (r.width <= 360 && r.height <= 360) ||
+                (painted && r.width * r.height < innerWidth * innerHeight * 0.6));
     if (whole) { if (onScreen(r)) out.push(el); return; }
-    // a container that's too big to swallow in one go: eat its parts instead
-    kids.forEach(function (k) { collect(k, out); });
+    kids.forEach(function (k) { collect(k, out, keep); });
   }
-  function collectAll() {
+  function collectAll(keep) {
     var out = [], root = document.querySelector('.wrapper') || document.body;
-    Array.prototype.forEach.call(root.children, function (c) { collect(c, out); });
+    Array.prototype.forEach.call(root.children, function (c) { collect(c, out, keep); });
     return out.map(function (el) {
       var r = el.getBoundingClientRect();
       return { el: el, style: el.getAttribute('style'), inline: getComputedStyle(el).display === 'inline',
-               c: { x: r.left + r.width / 2, y: r.top + r.height / 2 }, eaten: false, spin: (Math.random() - 0.5) * 540 };
+               c: { x: r.left + r.width / 2, y: r.top + r.height / 2 }, spin: Math.random() < 0.5 ? -1 : 1, jit: Math.random() };
     });
   }
 
-  // ---------- the head ----------
-  function build() {
-    head = document.createElement('div'); head.className = 'da-head'; head.setAttribute('aria-hidden', 'true');
-    mouth = document.createElement('div'); mouth.className = 'da-mouth';
-    var tongue = document.createElement('div'); tongue.className = 'da-tongue'; mouth.appendChild(tongue);
-    back = new Image(); back.src = HEAD_SRC; back.alt = '';
-    jaw = new Image(); jaw.src = HEAD_SRC; jaw.alt = '';
-    top = new Image(); top.src = HEAD_SRC; top.alt = '';
-    head.appendChild(back); head.appendChild(mouth); head.appendChild(jaw); head.appendChild(top);
-    document.body.appendChild(head);
-  }
-  function layout() {
-    size.w = HEAD.w * s; size.h = HEAD.h * s;
-    head.style.width = size.w + 'px'; head.style.height = size.h + 'px';
-    var cut = HEAD.mouthY * s;
-    top.style.clipPath = 'inset(0 0 ' + (size.h - cut).toFixed(1) + 'px 0)';
-    jaw.style.clipPath = 'inset(' + cut.toFixed(1) + 'px 0 0 0)';
-    back.style.clipPath = 'inset(' + (cut - 1).toFixed(1) + 'px 0 0 0)';
-    back.style.transformOrigin = '50% ' + cut.toFixed(1) + 'px';
-    var mw = size.w * 0.42;
-    mouth.style.width = mw + 'px'; mouth.style.left = (HEAD.mouthX * s - mw / 2) + 'px'; mouth.style.top = (cut - 2) + 'px';
-    mouth.style.setProperty('--da-teeth', (9 * s).toFixed(1) + 'px');
-    mouth.style.setProperty('--da-tooth', (7 * s).toFixed(1) + 'px');
-  }
-  function draw() {
-    var o = open * size.h * JAW_DROP;
-    jaw.style.transform = 'translateY(' + o.toFixed(1) + 'px) rotate(' + (open * -3).toFixed(2) + 'deg)';
-    back.style.transform = 'scaleY(' + (1 + o / (size.h - HEAD.mouthY * s)).toFixed(4) + ')';
-    mouth.style.height = Math.max(0, o + 3) + 'px';
-    mouth.style.opacity = open > 0.02 ? 1 : 0;
-    // never quite still: a constant twitch, worse the crazier he gets
-    var j = (1.2 + 3 * craze) * s, jx = (Math.random() - 0.5) * j, jy = (Math.random() - 0.5) * j, jr = (Math.random() - 0.5) * 2.5 * craze;
-    head.style.filter = 'saturate(' + (1.5 - 0.4 * green).toFixed(2) + ') contrast(1.18) sepia(' + (0.6 * green).toFixed(2) + ') hue-rotate(' + (55 * green).toFixed(0) + 'deg)';
-    head.style.transform = 'translate(' + (pos.x + jx).toFixed(1) + 'px,' + (pos.y + jy).toFixed(1) + 'px) rotate(' + (tilt + jr).toFixed(2) + 'deg) scale(' + (squash * puff).toFixed(3) + ',' + squash.toFixed(3) + ')';
-  }
-  function mouthAt() { return { x: pos.x + HEAD.mouthX * s, y: pos.y + HEAD.mouthY * s + open * size.h * JAW_DROP / 2 }; }
-  function posForMouth(m) { return { x: m.x - HEAD.mouthX * s, y: m.y - HEAD.mouthY * s }; }
-  function photoHome() { var r = photo.getBoundingClientRect(); return { x: r.left + HEAD.photoX * s, y: r.top + HEAD.photoY * s }; }
-  function btnCentre() { var r = btn.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+  // ---------- the face ----------
+  async function setupFace() {
+    var box = document.querySelector('.hero-eyes'), src, standin = null;
+    if (box && onScreen(box.getBoundingClientRect())) {
+      var im = box.querySelector('svg image');
+      src = im && (im.getAttribute('href') || im.getAttribute('xlink:href'));
+    }
+    if (!src) {
+      // no photo on screen: bring the face up in the middle of the page
+      if (!FACE_SRC) return null;
+      src = FACE_SRC;
+      standin = document.createElement('div'); standin.className = 'da-standin';
+      var pic = document.createElement('img'); pic.src = src; pic.alt = '';
+      standin.appendChild(pic); document.body.appendChild(standin);
+      box = standin;
+    }
+    var img = await loadImage(src);
+    if (!img) { if (standin) standin.remove(); return null; }
+    // freeze the current frame of the photo as the source for the warp
+    var srcCanvas = document.createElement('canvas'); srcCanvas.width = 600; srcCanvas.height = 600;
+    srcCanvas.getContext('2d').drawImage(img, 0, 0, 600, 600);
 
-  function flyTo(m, speed) {
-    var from = { x: pos.x, y: pos.y }, to = posForMouth(m);
-    var dx = to.x - from.x, dy = to.y - from.y, dist = Math.hypot(dx, dy);
-    var ms = clamp(dist / (speed || 1.5), 180, 650);
-    return tween(ms, function (p) {
-      var e = ease(p);
-      pos.x = from.x + dx * e; pos.y = from.y + dy * e;
-      tilt = clamp(dx / 30, -14, 14) * Math.sin(p * Math.PI);
-      open = 0.15 + 0.35 * Math.abs(Math.sin(p * Math.PI * 3));
-      draw();
+    var layer = document.createElement('div'); layer.className = 'da-face';
+    var canvas = document.createElement('canvas');
+    var sockets = document.createElement('div'); sockets.className = 'da-sockets';
+    var marker = document.createElement('div'); marker.className = 'da-marker';
+    layer.appendChild(canvas); layer.appendChild(sockets); layer.appendChild(marker);
+    if (getComputedStyle(box).position === 'static') { box.dataset.daPos = '1'; box.style.position = 'relative'; }
+    box.appendChild(layer);
+    var f = { box: box, layer: layer, canvas: canvas, ctx: canvas.getContext('2d'), sockets: sockets, marker: marker,
+              src: srcCanvas, standin: standin, boxFilter: box.style.filter, boxTransform: box.style.transform };
+    sizeFace(f);
+    // a tile of grain, so the drawn mouth has the same texture as the photo
+    var gc = document.createElement('canvas'); gc.width = gc.height = 64;
+    var gx = gc.getContext('2d'), gd = gx.createImageData(64, 64);
+    for (var i = 0; i < gd.data.length; i += 4) { var v = Math.random() * 255; gd.data[i] = gd.data[i + 1] = gd.data[i + 2] = v; gd.data[i + 3] = 255; }
+    gx.putImageData(gd, 0, 0);
+    f.grain = f.ctx.createPattern(gc, 'repeat');
+    if (standin) { void standin.offsetWidth; standin.style.opacity = '1'; await wait(450); }
+    return f;
+  }
+  function sizeFace(f) {
+    var W = f.box.clientWidth, H = f.box.clientHeight, dpr = Math.min(2, window.devicePixelRatio || 1);
+    f.W = W; f.H = H; f.k = Math.max(W, H) / 600; f.ox = (W - 600 * f.k) / 2; f.oy = (H - 600 * f.k) / 2; f.dpr = dpr;
+    f.canvas.width = Math.round(W * dpr); f.canvas.height = Math.round(H * dpr);
+    f.mouthCanvas = f.mouthCanvas || document.createElement('canvas');
+    f.mouthCanvas.width = f.canvas.width; f.mouthCanvas.height = f.canvas.height;
+    f.mouthCtx = f.mouthCanvas.getContext('2d');
+  }
+  // the middle of the open mouth, on screen
+  function mouthScreen() {
+    var y = MY + 108 * open * 0.4;
+    face.marker.style.left = (face.ox + MX * face.k) + 'px';
+    face.marker.style.top = (face.oy + y * face.k) + 'px';
+    var r = face.marker.getBoundingClientRect();
+    return { x: r.left, y: r.top };
+  }
+
+  // How the mouth is shaped right now
+  function mouthShape(t) {
+    var o = Math.max(0, open), tr = tremor * (Math.sin(t * 61) * 0.6 + Math.sin(t * 37.3) * 0.4);
+    return {
+      w: W0 + 34 * o,                     // the lips stretch far too wide
+      U: 18 * o * (1 + 0.1 * tr),         // upper lip pulls up
+      D: 108 * o * (1 + 0.06 * tr),
+      sk: 5 * o                           // the jaw hangs slightly off to one side        // the jaw drops
+    };
+  }
+  function profile(x, m) { var u = (x - MX) / m.w; return Math.abs(u) >= 1 ? 0 : Math.pow(1 - u * u, 0.62); }
+  function jaw(x, m) { return 1 - smooth(m.w * 0.55, m.w + 45, Math.abs(x - MX)); }
+  // the lips (and the skin just around them) stretch sideways to the new width of the mouth
+  function stretchX(x, y, m) {
+    // inside the mouth's width everything scales out; beyond it the push fades
+    // away before the edge of the face, so his jawline stays where it is
+    var r = Math.abs(x - MX), k = m.w / W0 - 1, band = Math.exp(-Math.pow((y - MY) / 30, 2));
+    var push = r <= W0 ? k * r : k * W0 * (1 - smooth(W0, 100, r));
+    return MX + (x < MX ? -1 : 1) * (r + push * band);
+  }
+  function warpUp(x, y, m) { var xx = stretchX(x, y, m); return [xx, y - m.U * profile(xx, m) * smooth(330, MY, y)]; }
+  function warpLow(x, y, m) {
+    var xx = stretchX(x, y, m), a = smooth(MY, MY + 30, y), j = jaw(xx, m);
+    xx += m.sk * ((1 - a) * profile(xx, m) + a * j);
+    return [xx, y + m.D * ((1 - a) * profile(xx - m.sk * profile(xx, m), m) + a * j)];
+  }
+
+  // draw the source triangle s0 s1 s2 onto d0 d1 d2
+  function tri(ctx, img, s, d) {
+    var s0x = s[0], s0y = s[1], s1x = s[2], s1y = s[3], s2x = s[4], s2y = s[5];
+    var d0x = d[0], d0y = d[1], d1x = d[2], d1y = d[3], d2x = d[4], d2y = d[5];
+    var den = (s1x - s0x) * (s2y - s0y) - (s2x - s0x) * (s1y - s0y);
+    if (!den) return;
+    var a = ((d1x - d0x) * (s2y - s0y) - (d2x - d0x) * (s1y - s0y)) / den;
+    var b = ((d1y - d0y) * (s2y - s0y) - (d2y - d0y) * (s1y - s0y)) / den;
+    var c = ((d2x - d0x) * (s1x - s0x) - (d1x - d0x) * (s2x - s0x)) / den;
+    var dd = ((d2y - d0y) * (s1x - s0x) - (d1y - d0y) * (s2x - s0x)) / den;
+    var e = d0x - a * s0x - c * s0y, f = d0y - b * s0x - dd * s0y;
+    // grow the clip a hair so neighbouring triangles don't leave seams
+    var cx = (d0x + d1x + d2x) / 3, cy = (d0y + d1y + d2y) / 3, g = 0.6;
+    function px(x, y) { var dx = x - cx, dy = y - cy, l = Math.hypot(dx, dy) || 1; return [x + dx / l * g, y + dy / l * g]; }
+    var p0 = px(d0x, d0y), p1 = px(d1x, d1y), p2 = px(d2x, d2y);
+    ctx.save();
+    ctx.beginPath(); ctx.moveTo(p0[0], p0[1]); ctx.lineTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.closePath(); ctx.clip();
+    ctx.transform(a, b, c, dd, e, f);
+    var minx = Math.max(0, Math.min(s0x, s1x, s2x) - 2), miny = Math.max(0, Math.min(s0y, s1y, s2y) - 2);
+    var maxx = Math.min(600, Math.max(s0x, s1x, s2x) + 2), maxy = Math.min(600, Math.max(s0y, s1y, s2y) + 2);
+    ctx.drawImage(img, minx, miny, maxx - minx, maxy - miny, minx, miny, maxx - minx, maxy - miny);
+    ctx.restore();
+  }
+  function mesh(ctx, img, y0, y1, rows, warp, m) {
+    var cols = 20, grid = [];
+    for (var j = 0; j <= rows; j++) {
+      var row = [], y = y0 + (y1 - y0) * j / rows;
+      for (var i = 0; i <= cols; i++) { var x = X0 + (X1 - X0) * i / cols, d = warp(x, y, m); row.push([x, y, d[0], d[1]]); }
+      grid.push(row);
+    }
+    for (var j2 = 0; j2 < rows; j2++) for (var i2 = 0; i2 < cols; i2++) {
+      var A = grid[j2][i2], B = grid[j2][i2 + 1], C = grid[j2 + 1][i2], D = grid[j2 + 1][i2 + 1];
+      tri(ctx, img, [A[0], A[1], B[0], B[1], C[0], C[1]], [A[2], A[3], B[2], B[3], C[2], C[3]]);
+      tri(ctx, img, [B[0], B[1], D[0], D[1], C[0], C[1]], [B[2], B[3], D[2], D[3], C[2], C[3]]);
+    }
+  }
+
+  function drawMouth(ctx, m, t) {
+    var x0 = MX - m.w, x1 = MX + m.w, N = 60, up = [], lo = [];
+    for (var i = 0; i <= N; i++) {
+      var x = x0 + (x1 - x0) * i / N, p = profile(x, m);
+      up.push([x, MY - m.U * p]); lo.push([x + m.sk * p, MY + m.D * p]);
+    }
+    function upY(x) { return MY - m.U * profile(x, m); }
+    function loY(x) { return MY + m.D * profile(x, m); }   // (teeth ignore the small sideways skew)
+    function cavityPath() {
+      ctx.beginPath(); ctx.moveTo(up[0][0], up[0][1]);
+      for (var i = 1; i <= N; i++) ctx.lineTo(up[i][0], up[i][1]);
+      for (var j = N; j >= 0; j--) ctx.lineTo(lo[j][0], lo[j][1]);
+      ctx.closePath();
+    }
+    ctx.save();
+    cavityPath();
+    ctx.filter = 'blur(4px)'; ctx.strokeStyle = 'rgba(45,18,12,.18)'; ctx.lineWidth = 8; ctx.stroke(); ctx.filter = 'none';
+    ctx.restore();
+    ctx.save();
+    cavityPath(); ctx.clip();
+    // the throat: almost black in the middle, raw and wet towards the edges
+    var g = ctx.createRadialGradient(MX, MY + m.D * 0.5, 1, MX, MY + m.D * 0.35, Math.max(m.w, m.D) * 1.0);
+    g.addColorStop(0, '#060102'); g.addColorStop(0.3, '#1c0507'); g.addColorStop(0.65, '#4a1416'); g.addColorStop(1, '#7a2e2c');
+    ctx.fillStyle = g; ctx.fillRect(x0 - 2, MY - m.U - 2, m.w * 2 + 4, m.U + m.D + 4);
+    // tongue, pulled back and down into the throat
+    if (m.D > 20) {
+      var ty = MY + m.D * 0.78, tg = ctx.createRadialGradient(MX - 8, ty - m.D * 0.12, 2, MX, ty, m.w * 0.7);
+      tg.addColorStop(0, '#8e3a3a'); tg.addColorStop(0.5, '#5b1d20'); tg.addColorStop(1, '#1d0608');
+      ctx.fillStyle = tg; ctx.beginPath(); ctx.ellipse(MX, ty, m.w * 0.55, m.D * 0.3, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(30,6,8,.6)'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(MX, ty - m.D * 0.26); ctx.quadraticCurveTo(MX + 2, ty - m.D * 0.1, MX, ty + m.D * 0.05); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,220,220,.18)'; ctx.beginPath(); ctx.ellipse(MX - m.w * 0.18, ty - m.D * 0.16, m.w * 0.16, m.D * 0.04, -0.2, 0, Math.PI * 2); ctx.fill();
+    }
+    // bare gums where the teeth should be
+    var gum = 3 + 7 * Math.min(1, open);
+    function gumBand(edgeY, dir) {
+      ctx.beginPath();
+      for (var i = 0; i <= N; i++) { var x = up[i][0]; ctx.lineTo(x, edgeY(x)); }
+      for (var j = N; j >= 0; j--) { var xx = up[j][0]; ctx.lineTo(xx, edgeY(xx) + dir * gum * profile(xx, m)); }
+      ctx.closePath();
+      var gg = ctx.createLinearGradient(0, edgeY(MX), 0, edgeY(MX) + dir * gum);
+      gg.addColorStop(0, '#4e2422'); gg.addColorStop(1, '#8a4c45');
+      ctx.fillStyle = gg; ctx.fill();
+    }
+    gumBand(upY, 1); gumBand(loY, -1);
+    // strings of saliva that stretch and snap as the jaw keeps dropping
+    [[-30, 0.55], [-9, 0.85], [14, 0.7], [37, 1.05]].forEach(function (sv, i) {
+      var x = MX + sv[0];
+      if (Math.abs(sv[0]) > m.w * 0.8) return;
+      var a = 1 - smooth(sv[1] - 0.12, sv[1], open);
+      if (a <= 0.02) return;
+      var p = profile(x, m), y0 = upY(x) + gum * p + 1, y1 = loY(x) - gum * p - 1;
+      if (y1 - y0 < 4) return;
+      var sway = Math.sin(t * 2 + i) * 2;
+      ctx.strokeStyle = 'rgba(225,215,205,' + (0.45 * a).toFixed(2) + ')'; ctx.lineWidth = 1.1;
+      ctx.beginPath(); ctx.moveTo(x, y0); ctx.quadraticCurveTo(x + sway, (y0 + y1) / 2 + (y1 - y0) * 0.18, x + 1.5, y1); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,' + (0.35 * a).toFixed(2) + ')'; ctx.lineWidth = 0.4;
+      ctx.beginPath(); ctx.moveTo(x - 0.4, y0); ctx.quadraticCurveTo(x - 0.4 + sway, (y0 + y1) / 2 + (y1 - y0) * 0.18, x + 1.1, y1); ctx.stroke();
+    });
+    // the lips throw shadow down into the mouth
+    var sh = ctx.createLinearGradient(0, MY - m.U, 0, MY - m.U + 26);
+    sh.addColorStop(0, 'rgba(10,2,2,.7)'); sh.addColorStop(1, 'rgba(10,2,2,0)');
+    ctx.fillStyle = sh; ctx.fillRect(x0 - 2, MY - m.U - 2, m.w * 2 + 4, 30);
+    var sh2 = ctx.createLinearGradient(0, MY + m.D, 0, MY + m.D - 18);
+    sh2.addColorStop(0, 'rgba(10,2,2,.45)'); sh2.addColorStop(1, 'rgba(10,2,2,0)');
+    ctx.fillStyle = sh2; ctx.fillRect(x0 - 2, MY + m.D - 20, m.w * 2 + 4, 22);
+    // the wet inner side of the lips, curling into the mouth
+    cavityPath();
+    ctx.strokeStyle = 'rgba(150,72,66,.55)'; ctx.lineWidth = 5; ctx.filter = 'blur(1.2px)'; ctx.stroke(); ctx.filter = 'none';
+    // inner shadow just inside the lips
+    cavityPath();
+    ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.lineWidth = 7; ctx.filter = 'blur(3px)'; ctx.stroke(); ctx.filter = 'none';
+    ctx.restore();
+
+    // where the cheeks have split, the edge is raw
+    ctx.save();
+    ctx.strokeStyle = 'rgba(95,25,25,' + (0.7 * smooth(0.15, 0.6, open)).toFixed(2) + ')'; ctx.lineWidth = 1.6;
+    [-1, 1].forEach(function (side) {
+      [up, lo].forEach(function (edge) {
+        ctx.beginPath();
+        var started = false;
+        edge.forEach(function (pt) {
+          if ((pt[0] - MX) * side < W0 * 1.05) return;
+          var j = Math.sin(pt[0] * 3.1) * 0.6;
+          if (!started) { ctx.moveTo(pt[0], pt[1] + j); started = true; } else ctx.lineTo(pt[0], pt[1] + j);
+        });
+        ctx.stroke();
+      });
+    });
+    // soften the seam between skin and mouth
+    ctx.filter = 'blur(1px)'; ctx.strokeStyle = 'rgba(60,22,20,.45)'; ctx.lineWidth = 1.5;
+    cavityPath(); ctx.stroke(); ctx.filter = 'none';
+    ctx.restore();
+  }
+
+  // eyes rolled back: nothing but white
+  function drawEyes(ctx) {
+    ctx.save();
+    ctx.globalAlpha = clamp(grade * 1.3, 0, 1);
+    ctx.filter = 'blur(0.5px)';
+    [[EYE_L, 250, 283], [EYE_R, 346, 290]].forEach(function (e) {
+      var g = ctx.createRadialGradient(e[1], e[2] + 2, 1, e[1], e[2], 26);
+      g.addColorStop(0, '#f1eee8'); g.addColorStop(0.55, '#e2dcd3'); g.addColorStop(1, '#a99d92');
+      ctx.fillStyle = g; ctx.fill(e[0]);
+      // the lid's shadow along the top, and a little pink in the corners
+      ctx.save(); ctx.clip(e[0]);
+      var lid = ctx.createLinearGradient(0, e[2] - 11, 0, e[2] + 2);
+      lid.addColorStop(0, 'rgba(70,40,30,.6)'); lid.addColorStop(1, 'rgba(70,40,30,0)');
+      ctx.fillStyle = lid; ctx.fillRect(e[1] - 30, e[2] - 14, 60, 18);
+      var side = ctx.createLinearGradient(e[1] - 24, 0, e[1] + 24, 0);
+      side.addColorStop(0, 'rgba(170,90,85,.45)'); side.addColorStop(0.22, 'rgba(170,90,85,0)');
+      side.addColorStop(0.78, 'rgba(170,90,85,0)'); side.addColorStop(1, 'rgba(170,90,85,.45)');
+      ctx.fillStyle = side; ctx.fillRect(e[1] - 30, e[2] - 14, 60, 30);
+      ctx.restore();
+    });
+    ctx.restore();
+  }
+
+  function drawFace(now) {
+    if (!face) return;
+    var ctx = face.ctx, t = now / 1000;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, face.canvas.width, face.canvas.height);
+    face.sockets.style.opacity = grade.toFixed(3);
+    face.box.style.filter = grade > 0.001 ? 'contrast(' + (1 + 0.28 * grade).toFixed(3) + ') saturate(' + (1 - 0.5 * grade).toFixed(3) + ') brightness(' + (1 - 0.08 * grade).toFixed(3) + ')' : face.boxFilter;
+    ctx.setTransform(face.k * face.dpr, 0, 0, face.k * face.dpr, face.ox * face.dpr, face.oy * face.dpr);
+    if (grade > 0.001) drawEyes(ctx);
+    if (open <= 0.002) return;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(0, TOP, 600, 600 - TOP); ctx.clip();
+    var m = mouthShape(t);
+    mesh(ctx, face.src, TOP, MY, 6, warpUp, m);
+    mesh(ctx, face.src, MY, 600, 12, warpLow, m);
+    var mc = face.mouthCanvas, mctx = face.mouthCtx;
+    mctx.setTransform(1, 0, 0, 1, 0, 0); mctx.clearRect(0, 0, mc.width, mc.height);
+    mctx.setTransform(face.k * face.dpr, 0, 0, face.k * face.dpr, face.ox * face.dpr, face.oy * face.dpr);
+    drawMouth(mctx, m, t);
+    // photo grain over the mouth only
+    mctx.save(); mctx.setTransform(1, 0, 0, 1, 0, 0); mctx.globalCompositeOperation = 'source-atop'; mctx.globalAlpha = 0.18;
+    mctx.fillStyle = face.grain; mctx.translate(Math.random() * 64, Math.random() * 64); mctx.fillRect(-64, -64, mc.width + 128, mc.height + 128);
+    mctx.restore();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.filter = 'blur(' + (0.45 * face.dpr).toFixed(2) + 'px) saturate(.8)';
+    ctx.drawImage(mc, 0, 0);
+    ctx.filter = 'none';
+    ctx.restore();
+  }
+
+  // ---------- breaking the page into pieces ----------
+  // Every bit of text is split into loose letters that fly on their own; the
+  // boxes, photos and icons they sat in fly as whole pieces. All of them are
+  // "frags" moved by the same little physics loop.
+  var frags = [], letterLayer = null, emptied = [];
+  var shake = { x: 0, y: 0 };
+  function shakePage(amount) {
+    if (amount < 0.3) { shake.x = shake.y = 0; }
+    else { shake.x = (Math.random() - 0.5) * amount; shake.y = (Math.random() - 0.5) * amount; }
+    if (!face) return;
+    var t = 'translate(' + shake.x.toFixed(1) + 'px,' + shake.y.toFixed(1) + 'px)';
+    face.box.style.transform = face.standin ? 'translate(-50%, -50%) ' + t : (shake.x || shake.y ? t : face.boxTransform);
+  }
+  function makeFrag(el, cx, cy, size, letter) {
+    return { el: el, x0: cx, y0: cy, x: cx, y: cy, vx: 0, vy: 0, rot: 0, vr: 0, s: 1, dark: 0, op: 1,
+             size: size, letter: letter, gone: false };
+  }
+  function lettersOf(it) {
+    var out = [], walker = document.createTreeWalker(it.el, NodeFilter.SHOW_TEXT), node, range = document.createRange();
+    while ((node = walker.nextNode())) {
+      var txt = node.nodeValue, parent = node.parentElement;
+      if (!txt.trim() || !parent) continue;
+      var cs = getComputedStyle(parent);
+      if (cs.visibility === 'hidden' || cs.display === 'none') continue;
+      for (var i = 0; i < txt.length; i++) {
+        if (/\s/.test(txt[i])) continue;
+        range.setStart(node, i); range.setEnd(node, i + 1);
+        var r = range.getClientRects()[0];
+        if (!r || r.width < 0.5 || !onScreen(r)) continue;
+        var sp = document.createElement('span');
+        sp.textContent = txt[i];
+        sp.style.cssText = 'position:fixed;margin:0;padding:0;white-space:pre;transform-origin:50% 50%;will-change:transform;' +
+          'left:' + r.left + 'px;top:' + r.top + 'px;height:' + r.height + 'px;line-height:' + r.height + 'px;' +
+          'font-family:' + cs.fontFamily + ';font-size:' + cs.fontSize + ';font-weight:' + cs.fontWeight + ';font-style:' + cs.fontStyle + ';' +
+          'letter-spacing:' + cs.letterSpacing + ';text-transform:' + cs.textTransform + ';color:' + cs.color + ';';
+        out.push({ el: sp, cx: r.left + r.width / 2, cy: r.top + r.height / 2, size: Math.max(r.width, r.height) });
+      }
+      if (!parent.classList.contains('da-textless')) { parent.classList.add('da-textless'); emptied.push(parent); }
+    }
+    return out;
+  }
+  function shatter() {
+    letterLayer = document.createElement('div');
+    letterLayer.style.cssText = 'position:fixed;inset:0;z-index:70;pointer-events:none;';
+    var made = [];
+    items.forEach(function (it) {
+      var el = it.el;
+      if (it.inline) el.style.display = 'inline-block';
+      // lift the box itself above the photo so it visibly goes into the mouth
+      if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+      el.style.zIndex = '70'; el.style.pointerEvents = 'none';
+      el.style.transition = 'none'; el.style.transformOrigin = 'center'; el.style.willChange = 'transform';
+      var letters = lettersOf(it);
+      letters.forEach(function (l) { letterLayer.appendChild(l.el); made.push(makeFrag(l.el, l.cx, l.cy, l.size, true)); });
+      // the box keeps its background, borders and pictures, but its text has left it
+      var r = el.getBoundingClientRect();
+      made.push(makeFrag(el, it.c.x, it.c.y, Math.max(r.width, r.height), false));
+    });
+    document.body.appendChild(letterLayer);
+    frags = made;
+  }
+  function apply(f) {
+    if (f.gone) { f.el.style.opacity = '0'; return; }
+    var dx = f.x - f.x0 + shake.x, dy = f.y - f.y0 + shake.y;
+    f.el.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) rotate(' + f.rot.toFixed(1) + 'deg) scale(' + f.s.toFixed(3) + ')';
+    f.el.style.opacity = f.op.toFixed(3);
+    f.el.style.filter = f.dark > 0.02 ? 'brightness(' + (1 - 0.9 * f.dark).toFixed(3) + ')' : '';
+  }
+  // run the physics until step() says everyone has arrived, or for at most `cap` ms
+  function simulate(cap, step) {
+    return new Promise(function (res) {
+      if (skip) return res();
+      waiters.push(res);
+      var start = performance.now(), last = start;
+      (function frame(now) {
+        if (skip) return res();
+        var dt = Math.min(0.033, Math.max(0, (now - last) / 1000)); last = now;
+        var done = step(now - start, dt, now);
+        frags.forEach(apply);
+        if (done || now - start > cap) res(); else requestAnimationFrame(frame);
+      })(start);
     });
   }
 
-  // ---------- eating ----------
-  function swallow(it, m, ms, delay) {
-    var el = it.el;
-    it.eaten = true;
-    if (it.inline) el.style.display = 'inline-block';
-    el.style.transition = 'none';
-    el.style.transformOrigin = 'center';
-    void el.offsetWidth;
-    el.style.transition = 'transform ' + ms + 'ms cubic-bezier(.55,0,.9,.35) ' + (delay || 0) + 'ms, opacity ' + (ms * 0.5) + 'ms ease-in ' + ((delay || 0) + ms * 0.5) + 'ms';
-    el.style.transform = 'translate(' + (m.x - it.c.x).toFixed(1) + 'px,' + (m.y - it.c.y).toFixed(1) + 'px) scale(.03) rotate(' + it.spin.toFixed(0) + 'deg)';
-    el.style.opacity = '0';
-  }
-  function grow(total) {
-    var eaten = items.filter(function (it) { return it.eaten; }).length;
-    var m = mouthAt();
-    s = s0 * (1 + 0.5 * eaten / Math.max(1, total));
-    layout();
-    var p = posForMouth({ x: m.x, y: m.y - open * size.h * JAW_DROP / 2 }); pos.x = p.x; pos.y = p.y;
-  }
-  async function bite(list, total) {
-    await tween(110, function (p) { open = 0.3 + 0.8 * p; draw(); });
-    var m = mouthAt();
-    var spread = list.length > 1 ? Math.min(30, 300 / list.length) : 0;
-    list.forEach(function (it, i) { swallow(it, m, 300, i * spread); });
-    await wait(300 + spread * (list.length - 1));
-    grow(total);
-    await tween(240, function (p) { open = 1.1 * (1 - p); squash = 1 + 0.14 * Math.sin(p * Math.PI); draw(); });
-  }
-  function word(text, at, rise) {
-    var n = document.createElement('div'); n.className = 'da-word'; n.textContent = text;
-    n.style.left = (at.x - 30) + 'px'; n.style.top = (at.y - 40) + 'px';
-    document.body.appendChild(n); extras.push(n);
-    requestAnimationFrame(function () { n.style.opacity = 1; n.style.transform = 'translateY(' + (-(rise || 30)) + 'px)'; });
-    setTimeout(function () { n.style.opacity = 0; }, 800);
-    setTimeout(function () { n.remove(); }, 1400);
-  }
-
-  // ---------- throwing up ----------
-  function spray(m, count, power) {
+  function spatter(m, count, power) {
     var drops = [];
     for (var i = 0; i < count; i++) {
       var d = document.createElement('div'); d.className = 'da-drop';
-      var r = (6 + Math.random() * Math.random() * 26) * Math.max(s, 0.7);
-      d.style.width = r + 'px'; d.style.height = (r * (0.7 + Math.random() * 0.6)) + 'px';
-      d.style.borderRadius = (40 + Math.random() * 20) + '% ' + (40 + Math.random() * 20) + '% ' + (40 + Math.random() * 20) + '% ' + (40 + Math.random() * 20) + '%';
-      d.style.background = DROP_COLOURS[i % DROP_COLOURS.length];
+      var r = 2 + Math.random() * Math.random() * 13;
+      d.style.width = r + 'px'; d.style.height = (r * (0.6 + Math.random() * 0.5)) + 'px';
+      d.style.borderRadius = '50%';
+      d.style.background = BILE[i % BILE.length];
+      d.style.opacity = (0.75 + Math.random() * 0.25).toFixed(2);
       document.body.appendChild(d); extras.push(d);
-      // mostly forwards and downwards out of the mouth, but some of it goes everywhere
-      var a = Math.random() < 0.7 ? Math.PI / 2 + (Math.random() - 0.5) * 2.4 : Math.random() * Math.PI * 2;
-      var v = (6 + Math.random() * 22) * (power || 1);
-      drops.push({ d: d, x: m.x, y: m.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 6, r: r, life: 0, spin: (Math.random() - 0.5) * 30, rot: 0 });
+      var a = Math.random() < 0.75 ? Math.PI / 2 + (Math.random() - 0.5) * 2.2 : Math.random() * Math.PI * 2;
+      var v = (5 + Math.random() * 20) * (power || 1);
+      drops.push({ d: d, x: m.x + (Math.random() - 0.5) * 30, y: m.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 4, r: r, life: 0 });
     }
     var last = performance.now();
     (function frame(now) {
       var dt = Math.min(32, now - last) / 16.67; last = now;
       var alive = false;
       drops.forEach(function (o) {
-        o.vy += 0.6 * dt; o.vx *= Math.pow(0.985, dt); o.x += o.vx * dt; o.y += o.vy * dt; o.life += dt; o.rot += o.spin * dt;
-        var a = Math.max(0, 1 - o.life / 90);
-        o.d.style.transform = 'translate(' + (o.x - o.r / 2).toFixed(1) + 'px,' + (o.y - o.r / 2).toFixed(1) + 'px) rotate(' + o.rot.toFixed(0) + 'deg)';
+        o.vy += 0.7 * dt; o.vx *= Math.pow(0.98, dt); o.x += o.vx * dt; o.y += o.vy * dt; o.life += dt;
+        var a = Math.max(0, 1 - o.life / 80);
+        var sp = Math.min(2, Math.hypot(o.vx, o.vy) / 10), ang = Math.atan2(o.vy, o.vx) * 180 / Math.PI;
+        o.d.style.transform = 'translate(' + (o.x - o.r / 2).toFixed(1) + 'px,' + (o.y - o.r / 2).toFixed(1) + 'px) rotate(' + ang.toFixed(0) + 'deg) scale(' + (1 + sp).toFixed(2) + ',' + (1 - sp * 0.25).toFixed(2) + ')';
         o.d.style.opacity = a;
-        if (a > 0 && o.y < innerHeight + 60) alive = true;
+        if (a > 0 && o.y < innerHeight + 40) alive = true;
       });
       if (alive && !skip) requestAnimationFrame(frame); else drops.forEach(function (o) { o.d.remove(); });
     })(last);
   }
-  function shockwave(m) {
-    var ring = document.createElement('div'); ring.className = 'da-ring';
-    ring.style.transform = 'translate(' + m.x + 'px,' + m.y + 'px) scale(.2)';
-    document.body.appendChild(ring); extras.push(ring);
-    void ring.offsetWidth;
-    ring.style.transition = 'transform .6s cubic-bezier(.1,.8,.3,1), opacity .6s ease-out';
-    ring.style.transform = 'translate(' + m.x + 'px,' + m.y + 'px) scale(' + (Math.max(innerWidth, innerHeight) / 18).toFixed(1) + ')';
-    ring.style.opacity = '0';
-    setTimeout(function () { ring.remove(); }, 700);
-  }
-  function shakePage(amount) {
-    if (!wrapper) return;
-    if (amount < 0.3) { wrapper.style.transform = ''; return; }
-    wrapper.style.transform = 'translate(' + ((Math.random() - 0.5) * amount).toFixed(1) + 'px,' + ((Math.random() - 0.5) * amount).toFixed(1) + 'px)';
-  }
-  async function throwUp() {
-    var m = mouthAt();
-    var order = items.slice().sort(function () { return Math.random() - 0.5; });
-    // put everything back in the mouth first, then blast it all home at once
-    order.forEach(function (it) {
-      it.el.style.transition = 'none';
-      it.el.style.transform = 'translate(' + (m.x - it.c.x).toFixed(1) + 'px,' + (m.y - it.c.y).toFixed(1) + 'px) scale(.03) rotate(' + (-it.spin * 2).toFixed(0) + 'deg)';
-    });
-    void document.body.offsetWidth;
-    var gap = Math.min(5, 200 / Math.max(1, order.length));
-    order.forEach(function (it, i) {
-      var orig = document.createElement('div');
-      if (it.style) orig.setAttribute('style', it.style);
-      it.el.style.transition = 'transform 520ms cubic-bezier(.12,1.6,.3,1) ' + (i * gap).toFixed(0) + 'ms, opacity 60ms linear ' + (i * gap).toFixed(0) + 'ms';
-      it.el.style.transform = orig.style.transform || '';
-      it.el.style.opacity = orig.style.opacity || '';
-    });
-    shockwave(m);
-    spray(m, 140, 1.3);
-    var bursts = 0, burstTimer = setInterval(function () {
-      if (skip || ++bursts > 8) return clearInterval(burstTimer);
-      spray(mouthAt(), 22, 1 - bursts * 0.08);
-    }, 90);
-    var from = { x: pos.x, y: pos.y };
-    await tween(order.length * gap + 900, function (p) {
-      // the blast knocks him back, then he hangs there retching
-      var kick = Math.sin(Math.min(1, p * 4) * Math.PI) * (1 - p);
-      pos.y = from.y - 50 * s * kick; pos.x = from.x;
-      open = p < 0.8 ? 1.5 : 1.5 * (1 - (p - 0.8) / 0.2);
-      squash = 1 + 0.12 * Math.sin(p * Math.PI * 14) * (1 - p);
-      puff = 1 + 0.1 * (1 - p);
-      green = Math.max(0, 1 - p * 1.4);
-      craze = 1 - 0.4 * p;
-      tilt = -10 * kick;
-      shakePage(28 * (1 - p) * (1 - p));
-      draw();
-    });
-    shakePage(0); puff = 1;
-  }
 
-  // ---------- page lock while he's out ----------
+  // ---------- page lock while it's happening ----------
   function blockScroll(e) { e.preventDefault(); }
   function onKey(e) {
     if (e.key === 'Escape') { finish(); return; }
@@ -295,113 +522,163 @@
     finished = true; skip = true;
     waiters.splice(0).forEach(function (r) { r(); });
     items.forEach(function (it) { if (it.style == null) it.el.removeAttribute('style'); else it.el.setAttribute('style', it.style); });
-    items = [];
+    items = []; frags = [];
+    if (letterLayer) { letterLayer.remove(); letterLayer = null; }
+    emptied.splice(0).forEach(function (el) { el.classList.remove('da-textless'); });
     extras.splice(0).forEach(function (n) { n.remove(); });
-    if (head) head.style.display = 'none';
-    if (wrapper) { if (wrapperStyle == null) wrapper.removeAttribute('style'); else wrapper.setAttribute('style', wrapperStyle); }
-    wrapper = null;
-    if (headless) headless.classList.remove('is-on');
-    headless = null;
+    shake.x = shake.y = 0;
+    if (face) {
+      face.layer.remove();
+      face.box.style.filter = face.boxFilter;
+      face.box.style.transform = face.boxTransform;
+      if (face.box.dataset.daPos) { face.box.style.position = ''; delete face.box.dataset.daPos; }
+      if (face.standin) face.standin.remove();
+      face = null;
+    }
+    open = 0; grade = 0; tremor = 0;
     lock(false);
     busy = false;
     try { btn.focus({ preventScroll: true }); } catch (e) {}
   }
 
-  // ---------- the whole show ----------
+  // ---------- the whole thing ----------
   async function run() {
-    var img = preload();
-    if (!img.complete) await new Promise(function (r) { img.onload = img.onerror = r; });
-    if (!img.naturalWidth) { busy = false; return; }
     skip = false; finished = false; waiters = [];
     lock(true);
+    face = await setupFace();
+    if (!face || skip) { finish(); return; }
+    items = collectAll(face.standin ? null : face.box);
+    shatter();
+    var m0 = mouthScreen();
+    frags.forEach(function (f) { f.r0 = Math.hypot(f.x0 - m0.x, f.y0 - m0.y); f.rnd = Math.random(); });
+    var maxR = frags.reduce(function (a, f) { return Math.max(a, f.r0); }, 1);
 
-    photo = document.querySelector('.hero-eyes');
-    var hl = photo && photo.querySelector('.chomp-headless');
-    fromPhoto = !!(photo && onScreen(photo.getBoundingClientRect()) && !(hl && hl.classList.contains('is-on')));
-    if (fromPhoto) {
-      s0 = photo.getBoundingClientRect().width / 600;
-      if (hl) { headless = hl; headless.classList.add('is-on'); }
-    } else {
-      s0 = clamp(innerWidth * 0.2, 150, 230) / HEAD.w;
-    }
-    s = s0; craze = 0.6; green = 0; puff = 1;
-    wrapper = document.querySelector('.wrapper'); wrapperStyle = wrapper && wrapper.getAttribute('style');
-    items = collectAll();
-    if (!head) build();
-    layout(); head.style.display = 'block';
-
-    // out he comes
-    if (fromPhoto) {
-      var home = photoHome(); pos.x = home.x; pos.y = home.y; open = 0; squash = 1; tilt = 0; draw();
-      await tween(450, function (p) { pos.y = home.y - 70 * s * Math.sin(p * Math.PI / 2); tilt = 8 * Math.sin(p * Math.PI * 3) * (1 - p); draw(); });
-    } else {
-      var b = btnCentre(), p0 = posForMouth(b); pos.x = p0.x; pos.y = p0.y + size.h * 0.25; tilt = 0;
-      await tween(450, function (p) { squash = Math.max(0.01, 1 - Math.pow(1 - p, 3) * (1 - 0.01) + 0.15 * Math.sin(p * Math.PI)); pos.y = p0.y + size.h * 0.25 * (1 - p); open = 0.6 * Math.sin(p * Math.PI); draw(); });
-      squash = 1;
-    }
-    await wait(250);
-
-    // eat his way around the screen, nearest thing first
-    var total = items.length, R = 150, stops = 0;
-    while (!skip) {
-      var left = items.filter(function (it) { return !it.eaten; });
-      if (!left.length) break;
-      var m = mouthAt();
-      if (stops >= 12) {
-        // getting full: hoover up whatever's left from the middle of the screen
-        await flyTo({ x: innerWidth / 2, y: innerHeight * 0.5 }, 1.6);
-        if (skip) break;
-        left.sort(function (a, b) { return Math.hypot(a.c.x - m.x, a.c.y - m.y) - Math.hypot(b.c.x - m.x, b.c.y - m.y); });
-        await bite(left, total);
-        break;
-      }
-      left.sort(function (a, b) { return Math.hypot(a.c.x - m.x, a.c.y - m.y) - Math.hypot(b.c.x - m.x, b.c.y - m.y); });
-      var target = left[0];
-      await flyTo(target.c);
-      if (skip) break;
-      var here = mouthAt(), reach = R * Math.max(s, 0.8);
-      var mouthful = left.filter(function (it) { return it === target || Math.hypot(it.c.x - here.x, it.c.y - here.y) < reach; });
-      await bite(mouthful, total);
-      if (stops % 3 === 1) word('nom', here);
-      stops++; R *= 1.12;
-    }
-    if (skip) return;
-
-    // full, queasy, and here it comes
-    await wait(300);
-    await flyTo({ x: innerWidth / 2, y: innerHeight * 0.42 }, 0.8);
-    // turns green, cheeks puff out, shaking harder and harder...
-    await tween(1100, function (p) {
-      green = p; craze = 0.6 + 0.4 * p;
-      tilt = Math.sin(p * Math.PI * 7) * 8 * p;
-      puff = 1 + 0.16 * Math.sin(Math.min(1, p * 1.2) * Math.PI / 2) + 0.03 * Math.sin(p * Math.PI * 16);
-      squash = 1 + Math.sin(p * Math.PI * 11) * 0.05 * p;
-      open = 0;
-      shakePage(6 * p * p);
-      draw();
+    // 1. the face goes wrong and the jaw starts to unhinge, in fits and starts;
+    //    the page starts to tremble
+    await tween(2200, function (p, now) {
+      grade = smooth(0, 0.5, p);
+      var e = Math.pow(p, 1.7), catchUp = Math.floor(p * 7) / 7;
+      open = e * 0.75 + Math.pow(catchUp, 1.7) * 0.25;
+      tremor = 0.4 + 0.6 * p;
+      var tr = smooth(0.5, 1, p);
+      frags.forEach(function (f) {
+        var k = tr * (f.letter ? 1.6 : 0.8) * (1.4 - f.r0 / maxR);
+        f.x = f.x0 + (Math.random() - 0.5) * k; f.y = f.y0 + (Math.random() - 0.5) * k;
+        f.rot = (Math.random() - 0.5) * k * (f.letter ? 3 : 0.4);
+        apply(f);
+      });
+      shakePage(2 * smooth(0.6, 1, p));
+      drawFace(now);
     });
-    await throwUp();
-    craze = 0.6; green = 0;
-    if (skip) return;
-    await wait(350);
 
-    // back home
-    if (fromPhoto) {
-      s = s0; layout();
-      var from = { x: pos.x, y: pos.y, tilt: tilt };
-      await tween(700, function (p) {
-        var h = photoHome(), e = 1 - Math.pow(1 - p, 3);
-        pos.x = from.x + (h.x - from.x) * e; pos.y = from.y + (h.y - from.y) * e - Math.sin(p * Math.PI) * 60;
-        tilt = from.tilt * (1 - e); open = 0; squash = 1; draw();
+    // 2. the page falls apart and is pulled in, nearest pieces first
+    frags.forEach(function (f) {
+      f.t0 = (f.r0 / maxR) * 2600 + f.rnd * 700;
+      f.crumble = 500 + Math.random() * 700;
+      f.vr = (Math.random() - 0.5) * (f.letter ? 260 : 40 * 200 / Math.max(200, f.size));
+      f.vx = (Math.random() - 0.5) * (f.letter ? 60 : 20);
+    });
+    await simulate(9000, function (ms, dt, now) {
+      var m = mouthScreen(), left = 0;
+      open = 1 + 0.05 * Math.sin(ms / 160) + 0.07 * smooth(0, 1500, ms);
+      tremor = 1;
+      frags.forEach(function (f) {
+        if (f.gone) return;
+        left++;
+        var age = ms - f.t0;
+        if (age < 0) {
+          // still holding on, shaking loose
+          var k = (f.letter ? 1.6 : 0.7);
+          f.x = f.x0 + (Math.random() - 0.5) * k; f.y = f.y0 + (Math.random() - 0.5) * k;
+          return;
+        }
+        if (age < f.crumble) {
+          // comes loose and starts to drop
+          f.vy += (f.letter ? 900 : 600) * dt;
+          f.x += f.vx * dt; f.y += f.vy * dt; f.rot += f.vr * dt;
+          return;
+        }
+        // then the mouth takes it
+        var dx = m.x - f.x, dy = m.y - f.y, d = Math.hypot(dx, dy) || 1;
+        var speed = Math.min(1500, 120 + (age - f.crumble) * 0.55);
+        var pull = Math.min(1, 3.2 * dt);
+        f.vx += (dx / d * speed - f.vx) * pull; f.vy += (dy / d * speed - f.vy) * pull;
+        f.x += f.vx * dt; f.y += f.vy * dt; f.rot += f.vr * dt;
+        var near = f.letter ? 130 : Math.max(160, f.size * 0.8);
+        f.s = clamp(d / near, 0.04, 1);
+        f.dark = 1 - clamp((d - 15) / 170, 0, 1);
+        if (d < 12) f.gone = true;
       });
-    } else {
-      var target2 = posForMouth(btnCentre()), from2 = { x: pos.x, y: pos.y };
-      await tween(600, function (p) {
-        var e = ease(p);
-        pos.x = from2.x + (target2.x - from2.x) * e; pos.y = from2.y + (target2.y - from2.y) * e;
-        squash = Math.max(0.01, 1 - e); open = 0; tilt = 20 * e; draw();
+      shakePage(3);
+      drawFace(now);
+      return left === 0;
+    });
+    frags.forEach(function (f) { f.gone = true; apply(f); });
+    shakePage(0);
+
+    // 3. the jaw slams shut; a long, still moment with an empty page
+    await tween(450, function (p, now) { open = 1.07 * (1 - Math.pow(p, 0.6)); tremor = 1 - p; drawFace(now); });
+    open = 0; tremor = 0;
+    await tween(1300, function (p, now) { drawFace(now); });
+
+    // 4. it comes back up
+    await tween(800, function (p, now) {
+      open = 0.18 * Math.abs(Math.sin(p * Math.PI * 3)) * p;
+      tremor = p;
+      shakePage(5 * p);
+      drawFace(now);
+    });
+    var mm = mouthScreen();
+    spatter(mm, 40, 1.1);
+    // everything is blown out of the mouth past where it belongs, then finds its way home
+    var order = frags.slice().sort(function () { return Math.random() - 0.5; });
+    order.forEach(function (f, i) {
+      f.launch = (i / order.length) * 500 + Math.random() * 80;
+      f.out = false;
+      f.x = mm.x; f.y = mm.y; f.s = 0.1; f.dark = 1; f.op = 1; f.gone = true;
+    });
+    await simulate(4200, function (ms, dt, now) {
+      var m = mouthScreen(), settled = 0;
+      open = ms < 120 ? 1.25 * (ms / 120) : 1.25 - 0.3 * smooth(120, 2200, ms);
+      tremor = 1;
+      order.forEach(function (f) {
+        var age = ms - f.launch;
+        if (age < 0) return;
+        if (!f.out) {
+          f.out = true; f.gone = false;
+          f.x = m.x + (Math.random() - 0.5) * 20; f.y = m.y + (Math.random() - 0.5) * 10;
+          var a = Math.atan2(f.y0 - f.y, f.x0 - f.x) + (Math.random() - 0.5) * 0.7;
+          var dist = Math.hypot(f.y0 - f.y, f.x0 - f.x);
+          var v = dist * 2.4 + 350 + Math.random() * 300;
+          f.vx = Math.cos(a) * v; f.vy = Math.sin(a) * v - 120;
+          f.vr = (Math.random() - 0.5) * (f.letter ? 900 : 120);
+        }
+        if (age < 450) {
+          // flung out: drag and a bit of gravity
+          var drag = Math.exp(-2.4 * dt);
+          f.vx *= drag; f.vy = f.vy * drag + 500 * dt;
+        } else {
+          // then pulled back into place like a spring
+          var k = 70, c = 12;
+          f.vx += ((f.x0 - f.x) * k - f.vx * c) * dt;
+          f.vy += ((f.y0 - f.y) * k - f.vy * c) * dt;
+          f.vr += (-f.rot * 60 - f.vr * 12) * dt;
+        }
+        f.x += f.vx * dt; f.y += f.vy * dt; f.rot += f.vr * dt;
+        f.s = Math.min(1, 0.1 + age / 280);
+        f.dark = 1 - smooth(0, 320, age);
+        if (age > 900 && Math.hypot(f.x - f.x0, f.y - f.y0) < 0.6 && Math.abs(f.rot) < 0.6 && Math.hypot(f.vx, f.vy) < 8) settled++;
       });
-    }
+      shakePage(20 * Math.max(0, 1 - ms / 900));
+      drawFace(now);
+      return settled === order.length;
+    });
+    frags.forEach(function (f) { f.x = f.x0; f.y = f.y0; f.rot = 0; f.s = 1; f.dark = 0; f.op = 1; f.gone = false; apply(f); });
+    shakePage(0);
+
+    // 5. the face slowly settles back
+    await tween(1200, function (p, now) { open = 0.95 * (1 - ease(p)); tremor = 1 - p; grade = 1 - ease(p); drawFace(now); });
+    if (face && face.standin) { face.standin.style.opacity = '0'; await wait(450); }
     finish();
   }
 
@@ -409,7 +686,7 @@
     if (busy) return;
     busy = true;
     if (reduceMotion) {
-      // no flying heads: just blank the page for a moment and bring it back
+      // no warping or flying: just blank the page for a moment and bring it back
       var root = document.querySelector('main') || document.body;
       root.style.transition = 'opacity .3s'; root.style.opacity = '0';
       setTimeout(function () { root.style.opacity = ''; setTimeout(function () { root.style.transition = ''; busy = false; }, 350); }, 900);
