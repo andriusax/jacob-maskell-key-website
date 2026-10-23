@@ -133,7 +133,9 @@
       standin.appendChild(pic); document.body.appendChild(standin);
       box = standin;
     }
-    var img = await loadImage(src);
+    // always warp the photo's first frame, so the mouth is at rest
+    var img = null;
+    try { img = await createImageBitmap(await (await fetch(src)).blob()); } catch (e) { img = await loadImage(src); }
     if (!img) { if (standin) standin.remove(); return null; }
     // freeze the current frame of the photo as the source for the warp
     var srcCanvas = document.createElement('canvas'); srcCanvas.width = 600; srcCanvas.height = 600;
