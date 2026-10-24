@@ -1,6 +1,6 @@
 {% comment %}
   On every page except the homepage and About: 5 seconds after the page opens, Jacob's
-  head slowly slides in from the side or bottom of the screen and stays there,
+  head slowly slides in from the left or right side of the screen and stays there,
   half hidden, watching. Somewhere different each time. If the cursor comes
   close, his mouth starts to fall open (drawn by face-warp.html). Click it and
   it ducks away for the rest of that page. Switch it off in Pages CMS with
@@ -51,19 +51,15 @@
     btn.style.width = w + 'px'; btn.style.height = h + 'px';
     btn.appendChild(face.canvas);
 
-    // somewhere different every time: either side, or rising up from the bottom
-    var edges = ['left', 'right', 'bottom'], edge = edges[Math.floor(Math.random() * edges.length)];
+    // somewhere different every time, from the left or the right
+    var edge = Math.random() < 0.5 ? 'left' : 'right';
     var tiltDeg = 34 + Math.random() * 14, out, peek;
     if (edge === 'left') {
       btn.style.left = '0px'; btn.style.top = (innerHeight * (0.12 + Math.random() * 0.5)) + 'px';
       out = 'translateX(-130%) rotate(' + tiltDeg + 'deg)'; peek = 'translateX(-40%) rotate(' + tiltDeg + 'deg)';
-    } else if (edge === 'right') {
+    } else {
       btn.style.right = '0px'; btn.style.top = (innerHeight * (0.12 + Math.random() * 0.5)) + 'px';
       out = 'translateX(130%) rotate(' + (-tiltDeg) + 'deg)'; peek = 'translateX(40%) rotate(' + (-tiltDeg) + 'deg)';
-    } else {
-      btn.style.bottom = '0px'; btn.style.left = (innerWidth * (0.08 + Math.random() * 0.78) - w / 2) + 'px';
-      var lean = (Math.random() - 0.5) * 16;
-      out = 'translateY(105%) rotate(' + lean + 'deg)'; peek = 'translateY(53%) rotate(' + lean + 'deg)';
     }
     btn.style.transform = out;
     document.body.appendChild(btn);
