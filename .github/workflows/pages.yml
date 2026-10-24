@@ -35,6 +35,16 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Make a still of the left hero photo
+        run: |
+          pip install --quiet pillow pyyaml
+          python .github/scripts/hero_still.py
+
       - name: Build with Jekyll
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
