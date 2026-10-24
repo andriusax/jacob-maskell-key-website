@@ -1,0 +1,101 @@
+{% comment %}
+  On every page except the homepage: 5 seconds after the page opens, Jacob's
+  head slowly slides in from the side or bottom of the screen and stays there,
+  half hidden, watching. Somewhere different each time. If the cursor comes
+  close, his mouth starts to fall open (drawn by face-warp.html). Click it and
+  it ducks away for the rest of that page. Switch it off in Pages CMS with
+  "Peeking head on the other pages".
+{% endcomment %}
+<style>
+  .peek-head { position: fixed; z-index: 45; margin: 0; padding: 0; border: 0; background: none; cursor: pointer;
+    transform-origin: 50% 50%; -webkit-tap-highlight-color: transparent; }
+  .peek-head:focus-visible { outline: 2px solid var(--color-heading, #0b0f2e); outline-offset: -6px; }
+  html.da-busy .peek-head, html.chomp-ate .peek-head { display: none; }
+</style>
+<script>
+(function () {
+  var SRC = '{{ "/assets/images/chomp-head.webp" | relative_url }}';
+  var DELAY = 5000;
+  var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  function start() {
+    // only count time the page is actually being looked at
+    if (document.hidden) {
+      document.addEventListener('visibilitychange', function again() {
+        if (document.hidden) return;
+        document.removeEventListener('visibilitychange', again);
+        setTimeout(start, 1500);
+      });
+      return;
+    }
+    if (!window.JMKFace) return;
+    var img = new Image();
+    img.onload = function () { appear(img); };
+    img.src = SRC;
+  }
+
+  function appear(img) {
+    var face = window.JMKFace.create(img);
+    var w = clamp(innerWidth * 0.13, 105, 180);
+    face.size(w);
+    face.draw(0, 0, 0);
+    var h = w * (face.H + face.EXTRA) / face.W;
+
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'peek-head';
+    btn.setAttribute('aria-label', 'Make the face go away');
+    btn.style.width = w + 'px'; btn.style.height = h + 'px';
+    btn.appendChild(face.canvas);
+
+    // somewhere different every time: either side, or rising up from the bottom
+    var edges = ['left', 'right', 'bottom'], edge = edges[Math.floor(Math.random() * edges.length)];
+    var tiltDeg = 16 + Math.random() * 14, out, peek;
+    if (edge === 'left') {
+      btn.style.left = '0px'; btn.style.top = (innerHeight * (0.12 + Math.random() * 0.5)) + 'px';
+      out = 'translateX(-120%) rotate(' + tiltDeg + 'deg)'; peek = 'translateX(-46%) rotate(' + tiltDeg + 'deg)';
+    } else if (edge === 'right') {
+      btn.style.right = '0px'; btn.style.top = (innerHeight * (0.12 + Math.random() * 0.5)) + 'px';
+      out = 'translateX(120%) rotate(' + (-tiltDeg) + 'deg)'; peek = 'translateX(46%) rotate(' + (-tiltDeg) + 'deg)';
+    } else {
+      btn.style.bottom = '0px'; btn.style.left = (innerWidth * (0.08 + Math.random() * 0.78) - w / 2) + 'px';
+      var lean = (Math.random() - 0.5) * 16;
+      out = 'translateY(105%) rotate(' + lean + 'deg)'; peek = 'translateY(53%) rotate(' + lean + 'deg)';
+    }
+    btn.style.transform = out;
+    document.body.appendChild(btn);
+    void btn.offsetWidth;
+    btn.style.transition = reduceMotion ? 'none' : 'transform 1.8s cubic-bezier(.25,.6,.2,1)';
+    btn.style.transform = peek;
+
+    // his mouth falls open as the cursor gets close, and closes again as it leaves
+    var open = 0, want = 0, raf = 0, gone = false;
+    function loop(now) {
+      open += (want - open) * 0.05;
+      if (Math.abs(want - open) < 0.002) open = want;
+      face.draw(open, now / 1000, open * 0.6);
+      raf = open === want && want === 0 ? 0 : requestAnimationFrame(loop);
+    }
+    function onMove(e) {
+      if (gone) return;
+      var r = btn.getBoundingClientRect();
+      var d = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
+      want = clamp(1 - (d - 60) / 260, 0, 1) * 0.55;
+      if (!raf) raf = requestAnimationFrame(loop);
+    }
+    window.addEventListener('pointermove', onMove, { passive: true });
+
+    btn.addEventListener('click', function () {
+      if (gone) return;
+      gone = true; want = 0;
+      window.removeEventListener('pointermove', onMove);
+      btn.style.transition = reduceMotion ? 'none' : 'transform .35s cubic-bezier(.5,0,.8,.4)';
+      btn.style.transform = out;
+      setTimeout(function () { cancelAnimationFrame(raf); btn.remove(); }, reduceMotion ? 0 : 400);
+    });
+  }
+
+  setTimeout(start, DELAY);
+})();
+</script>

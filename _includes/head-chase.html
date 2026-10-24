@@ -1,9 +1,10 @@
 {% comment %}
   Homepage easter egg: a little tab pops out somewhere on the edge of the page.
-  Clicking it makes Jacob's head jump out of the photo and chase the cursor
-  (or a finger on phones) trying to eat it. Esc sends it home; it gives up
-  after 20 seconds. Skipped for people who have reduced motion turned on.
-  Works with the eyes photo (_includes/hero-eyes.html) and its measurements.
+  Clicking it makes Jacob's head leave the photo and stalk the cursor (or a
+  finger on phones), its mouth slowly opening wider the closer it gets, until
+  it swallows it. Esc sends it home; it gives up after 20 seconds. Skipped for
+  people who have reduced motion turned on. The mouth is drawn by
+  face-warp.html. Works with the eyes photo (_includes/hero-eyes.html).
 {% endcomment %}
 <style>
   .hero-eyes { position: relative; }
@@ -19,12 +20,8 @@
   .chomp-tab[data-edge="top"] { top: env(safe-area-inset-top, 0px); border-radius: 0 0 8px 8px; transform: translateY(-110%); }
   .chomp-tab.is-in { opacity: 1; transform: none; }
   .chomp-tab.is-in:hover { filter: brightness(1.08); }
-  .chomp-head { position: fixed; left: 0; top: 0; z-index: 60; pointer-events: none; display: none; will-change: transform; transform-origin: 50% 60%; }
-  .chomp-head img { position: absolute; left: 0; top: 0; width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none; }
-  .chomp-head .chomp-mouth { position: absolute; border-radius: 50%; background: radial-gradient(ellipse at 50% 35%, #5a0f12 0 40%, #240405 75%); }
-  .chomp-head .chomp-tongue { position: absolute; left: 22%; right: 22%; bottom: 8%; height: 45%; border-radius: 50% 50% 45% 45%; background: #b8454b; }
+  .chomp-head { position: fixed; left: 0; top: 0; z-index: 60; pointer-events: none; display: none; will-change: transform; transform-origin: 43% 60%; }
   html.chomp-ate, html.chomp-ate * { cursor: none !important; }
-  .chomp-nom { position: fixed; z-index: 61; pointer-events: none; font: 800 22px/1 var(--font-display, "Helvetica Neue", Helvetica, Arial, sans-serif); color: #e8231f; opacity: 0; transition: opacity .2s, transform .6s; }
 </style>
 <script>
 (function () {
@@ -62,58 +59,44 @@
   }
   placeTab();
 
-  // ---- the head: one picture used three times (face, jaw, and a stretched copy behind the open mouth) ----
-  var head, top, jaw, back, mouth;
+  // ---- the head, drawn by face-warp.html so the mouth opens from the lips ----
+  var head, face, headImg = new Image();
+  headImg.src = IMG.head;
   var running = false, eating = false;
   var pos = { x: 0, y: 0 }, vel = { x: 0, y: 0 }, scale = 1, size = { w: 0, h: 0 };
   var target = null, startT = 0, raf = 0, last = 0;
-  var open = 0, chompPhase = 0, tilt = 0, squash = 1;
+  var open = 0, phase = 0, tilt = 0, tremor = 0;
 
   function build() {
     head = document.createElement('div'); head.className = 'chomp-head'; head.setAttribute('aria-hidden', 'true');
-    mouth = document.createElement('div'); mouth.className = 'chomp-mouth';
-    var tongue = document.createElement('div'); tongue.className = 'chomp-tongue'; mouth.appendChild(tongue);
-    back = new Image(); back.src = IMG.head; back.alt = '';
-    jaw = new Image(); jaw.src = IMG.head; jaw.alt = '';
-    top = new Image(); top.src = IMG.head; top.alt = '';
-    head.appendChild(back); head.appendChild(mouth); head.appendChild(jaw); head.appendChild(top);
+    face = window.JMKFace.create(headImg);
+    head.appendChild(face.canvas);
     document.body.appendChild(head);
   }
 
   function layout() {
     var r = photo.getBoundingClientRect(); scale = r.width / 600;
     size.w = HEAD.w * scale; size.h = HEAD.h * scale;
-    head.style.width = size.w + 'px'; head.style.height = size.h + 'px';
-    var cut = HEAD.mouthY * scale;
-    top.style.clipPath = 'inset(0 0 ' + (size.h - cut).toFixed(1) + 'px 0)';
-    jaw.style.clipPath = 'inset(' + cut.toFixed(1) + 'px 0 0 0)';
-    back.style.clipPath = 'inset(' + (cut - 1).toFixed(1) + 'px 0 0 0)';
-    back.style.transformOrigin = '50% ' + cut.toFixed(1) + 'px';
-    var mw = size.w * 0.34;
-    mouth.style.width = mw + 'px'; mouth.style.left = (HEAD.mouthX * scale - mw / 2) + 'px'; mouth.style.top = (cut - 2) + 'px';
+    face.size(size.w);
   }
 
   function homePos() { var r = photo.getBoundingClientRect(); return { x: r.left + HEAD.x * scale, y: r.top + HEAD.y * scale }; }
-  function mouthPoint() { return { x: pos.x + HEAD.mouthX * scale, y: pos.y + HEAD.mouthY * scale + open * size.h * 0.045 }; }
+  function mouthPoint() { var m = face.mouth(open); return { x: pos.x + m.x * scale, y: pos.y + m.y * scale }; }
 
-  function draw() {
-    var o = open * size.h * 0.09;
-    jaw.style.transform = 'translateY(' + o.toFixed(1) + 'px) rotate(' + (open * -3).toFixed(2) + 'deg)';
-    back.style.transform = 'scaleY(' + (1 + o / (size.h - HEAD.mouthY * scale)).toFixed(4) + ')';
-    mouth.style.height = Math.max(0, o + 3) + 'px';
-    mouth.style.opacity = open > 0.02 ? 1 : 0;
-    head.style.transform = 'translate(' + pos.x.toFixed(1) + 'px,' + pos.y.toFixed(1) + 'px) rotate(' + tilt.toFixed(2) + 'deg) scale(' + squash.toFixed(3) + ')';
+  function draw(now) {
+    face.draw(open, (now || performance.now()) / 1000, tremor);
+    head.style.transform = 'translate(' + pos.x.toFixed(1) + 'px,' + pos.y.toFixed(1) + 'px) rotate(' + tilt.toFixed(2) + 'deg)';
   }
 
   function onMove(e) { target = { x: e.clientX, y: e.clientY }; }
   function onKey(e) { if (e.key === 'Escape' && running) goHome(); }
 
   function release() {
-    if (running) return;
+    if (running || !window.JMKFace || !headImg.complete) return;
     tab.classList.remove('is-in');
     if (!head) build();
     layout();
-    var h = homePos(); pos.x = h.x; pos.y = h.y; vel.x = 0; vel.y = -9 * Math.max(scale, 0.6);
+    var h = homePos(); pos.x = h.x; pos.y = h.y; vel.x = 0; vel.y = -4 * Math.max(scale, 0.6); open = 0; tremor = 0;
     headless.classList.add('is-on');
     head.style.display = 'block'; running = true; eating = false; startT = performance.now(); last = 0;
     window.addEventListener('pointermove', onMove, { passive: true });
@@ -129,41 +112,40 @@
       var m = mouthPoint();
       var t = target || { x: innerWidth / 2, y: innerHeight / 2 };
       var dx = t.x - m.x, dy = t.y - m.y, dist = Math.hypot(dx, dy) || 1;
-      // steer toward the cursor; the top speed lets a quick hand get away
-      var maxV = 7.5 * Math.max(scale, 0.7), acc = 0.55;
+      // stalk the cursor; the top speed lets a quick hand get away
+      var maxV = 5.8 * Math.max(scale, 0.7), acc = 0.38;
       vel.x += dx / dist * acc * dt; vel.y += dy / dist * acc * dt;
       var sp = Math.hypot(vel.x, vel.y); if (sp > maxV) { vel.x *= maxV / sp; vel.y *= maxV / sp; }
       vel.x *= 0.985; vel.y *= 0.985;
       pos.x += vel.x * dt; pos.y += vel.y * dt;
-      tilt += ((vel.x * 2.2) - tilt) * 0.15;
-      chompPhase += 0.32 * dt;
-      var near = Math.max(0, 1 - dist / 260);
-      open = 0.25 + 0.75 * (0.5 + 0.5 * Math.sin(chompPhase)) * (0.45 + 0.55 * near);
-      squash += (1 - squash) * 0.2;
+      tilt += ((vel.x * 1.1) - tilt) * 0.08;
+      // the mouth hangs open and widens slowly the closer it gets, with a slight tremble
+      phase += 0.07 * dt;
+      var near = Math.max(0, 1 - dist / 320);
+      var want = (0.12 + 0.88 * near * near) * (0.85 + 0.15 * Math.sin(phase));
+      open += (want - open) * 0.06 * dt;
+      tremor = 0.3 + 0.7 * near;
       if (target && dist < 26 * Math.max(scale, 0.7)) eat(t);
       else if (now - startT > 20000) goHome();
     }
-    draw();
+    draw(now);
     raf = requestAnimationFrame(step);
   }
 
   function eat(t) {
     eating = true;
     document.documentElement.classList.add('chomp-ate');
-    var k = 0;
-    var gulp = setInterval(function () {
-      k++; open = k % 2 ? 0 : 0.6; squash = k % 2 ? 1.12 : 0.96; draw();
-      if (k >= 5) { clearInterval(gulp); open = 0; squash = 1; draw(); nom(t); setTimeout(goHome, 900); }
-    }, 110);
-  }
-
-  function nom(t) {
-    var n = document.createElement('div'); n.className = 'chomp-nom'; n.textContent = 'nom';
-    n.style.left = (t.x - 20) + 'px'; n.style.top = (t.y - 30) + 'px';
-    document.body.appendChild(n);
-    requestAnimationFrame(function () { n.style.opacity = 1; n.style.transform = 'translateY(-30px)'; });
-    setTimeout(function () { n.style.opacity = 0; }, 700);
-    setTimeout(function () { n.remove(); }, 1300);
+    // the jaw snaps shut, then a couple of slow chews, then it swallows
+    var t0 = performance.now(), from = open;
+    (function chew(now) {
+      var ms = now - t0;
+      if (ms < 120) open = from * (1 - ms / 120);
+      else if (ms < 1300) open = 0.12 * Math.max(0, Math.sin((ms - 120) / 1180 * Math.PI * 3));
+      else open = 0;
+      tremor = ms < 1300 ? 0.4 : 0;
+      draw(now);
+      if (ms < 1700 && running) requestAnimationFrame(chew); else goHome();
+    })(t0);
   }
 
   function goHome() {
@@ -173,13 +155,13 @@
     window.removeEventListener('pointerdown', onMove);
     window.removeEventListener('keydown', onKey);
     cancelAnimationFrame(raf);
-    var from = { x: pos.x, y: pos.y, tilt: tilt }, t0 = performance.now(), D = 700;
+    var from = { x: pos.x, y: pos.y, tilt: tilt }, t0 = performance.now(), D = 900;
     (function fly(now) {
       layout(); var h = homePos();
       var p = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - p, 3);
       pos.x = from.x + (h.x - from.x) * e;
-      pos.y = from.y + (h.y - from.y) * e - Math.sin(p * Math.PI) * 60;
-      tilt = from.tilt * (1 - e); open = 0; squash = 1; draw();
+      pos.y = from.y + (h.y - from.y) * e;
+      tilt = from.tilt * (1 - e); open *= 0.85; tremor = 0; draw(now);
       if (p < 1) { requestAnimationFrame(fly); return; }
       headless.classList.remove('is-on');
       head.style.display = 'none';

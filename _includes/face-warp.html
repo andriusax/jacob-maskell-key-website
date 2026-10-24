@@ -1,0 +1,153 @@
+{% comment %}
+  Shared by the chasing head (head-chase.html) and the peeking head
+  (peek-head.html): draws Jacob's cut-out head on a canvas and opens his mouth
+  by stretching the photo itself, so the lips pull apart around a dark,
+  toothless opening instead of the face splitting in two. A milder version of
+  the mouth in delete-all.html.
+
+  window.JMKFace.create(img) -> face
+    face.canvas        the canvas to put on the page
+    face.size(px)      set the head's width on screen (the canvas is taller
+                       than the head, to leave room for the jaw to drop)
+    face.draw(open, t, tremor)   open 0..1, t = seconds, tremor 0..1
+    face.mouth(open)   where the middle of the open mouth is, in head pixels
+  Measurements are for /assets/images/chomp-head.webp (272x431).
+{% endcomment %}
+<script>
+window.JMKFace = (function () {
+  var W = 272, H = 431;           // the cut-out head
+  var MX = 118, MY = 312, W0 = 41; // middle of his lips, and half their width
+  var TOP = 233;                  // nothing above this moves
+  var EXTRA = 80;                 // room under the head for the jaw
+
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function smooth(a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+
+  function shape(open, t, tremor) {
+    var o = Math.max(0, open), tr = (tremor || 0) * (Math.sin(t * 57) * 0.6 + Math.sin(t * 33.1) * 0.4);
+    return { o: o, w: W0 + 16 * o, U: 9 * o * (1 + 0.1 * tr), D: 62 * o * (1 + 0.06 * tr), sk: 2.5 * o };
+  }
+  function profile(x, m) { var u = (x - MX) / m.w; return Math.abs(u) >= 1 ? 0 : Math.pow(1 - u * u, 0.62); }
+  function jaw(x, m) { return 1 - smooth(m.w * 0.55, m.w + 45, Math.abs(x - MX)); }
+  function stretchX(x, y, m) {
+    var r = Math.abs(x - MX), k = m.w / W0 - 1, band = Math.exp(-Math.pow((y - MY) / 26, 2));
+    var push = r <= W0 ? k * r : k * W0 * (1 - smooth(W0, 95, r));
+    return MX + (x < MX ? -1 : 1) * (r + push * band);
+  }
+  function warpUp(x, y, m) { var xx = stretchX(x, y, m); return [xx, y - m.U * profile(xx, m) * smooth(TOP + 10, MY, y)]; }
+  function warpLow(x, y, m) {
+    var xx = stretchX(x, y, m), a = smooth(MY, MY + 26, y), j = jaw(xx, m);
+    xx += m.sk * ((1 - a) * profile(xx, m) + a * j);
+    return [xx, y + m.D * ((1 - a) * profile(xx - m.sk * profile(xx, m), m) + a * j)];
+  }
+
+  function tri(ctx, img, s, d) {
+    var den = (s[2] - s[0]) * (s[5] - s[1]) - (s[4] - s[0]) * (s[3] - s[1]);
+    if (!den) return;
+    var a = ((d[2] - d[0]) * (s[5] - s[1]) - (d[4] - d[0]) * (s[3] - s[1])) / den;
+    var b = ((d[3] - d[1]) * (s[5] - s[1]) - (d[5] - d[1]) * (s[3] - s[1])) / den;
+    var c = ((d[4] - d[0]) * (s[2] - s[0]) - (d[2] - d[0]) * (s[4] - s[0])) / den;
+    var dd = ((d[5] - d[1]) * (s[2] - s[0]) - (d[3] - d[1]) * (s[4] - s[0])) / den;
+    var e = d[0] - a * s[0] - c * s[1], f = d[1] - b * s[0] - dd * s[1];
+    var cx = (d[0] + d[2] + d[4]) / 3, cy = (d[1] + d[3] + d[5]) / 3;
+    ctx.save(); ctx.beginPath();
+    for (var i = 0; i < 6; i += 2) {
+      var dx = d[i] - cx, dy = d[i + 1] - cy, l = Math.hypot(dx, dy) || 1;
+      ctx[i ? 'lineTo' : 'moveTo'](d[i] + dx / l * 0.25, d[i + 1] + dy / l * 0.25);  // tiny overlap; the head underneath covers any hairline gaps
+    }
+    ctx.closePath(); ctx.clip();
+    ctx.transform(a, b, c, dd, e, f);
+    var x0 = Math.max(0, Math.min(s[0], s[2], s[4]) - 2), y0 = Math.max(0, Math.min(s[1], s[3], s[5]) - 2);
+    var x1 = Math.min(W, Math.max(s[0], s[2], s[4]) + 2), y1 = Math.min(H, Math.max(s[1], s[3], s[5]) + 2);
+    ctx.drawImage(img, x0, y0, x1 - x0, y1 - y0, x0, y0, x1 - x0, y1 - y0);
+    ctx.restore();
+  }
+  function mesh(ctx, img, y0, y1, rows, warp, m) {
+    var cols = 14, grid = [];
+    for (var j = 0; j <= rows; j++) {
+      var row = [], y = y0 + (y1 - y0) * j / rows;
+      for (var i = 0; i <= cols; i++) { var x = W * i / cols, d = warp(x, y, m); row.push([x, y, d[0], d[1]]); }
+      grid.push(row);
+    }
+    for (var r = 0; r < rows; r++) for (var q = 0; q < cols; q++) {
+      var A = grid[r][q], B = grid[r][q + 1], C = grid[r + 1][q], D = grid[r + 1][q + 1];
+      tri(ctx, img, [A[0], A[1], B[0], B[1], C[0], C[1]], [A[2], A[3], B[2], B[3], C[2], C[3]]);
+      tri(ctx, img, [B[0], B[1], D[0], D[1], C[0], C[1]], [B[2], B[3], D[2], D[3], C[2], C[3]]);
+    }
+  }
+
+  function drawMouth(ctx, m, t) {
+    var N = 40, up = [], lo = [];
+    for (var i = 0; i <= N; i++) {
+      var x = MX - m.w + 2 * m.w * i / N, p = profile(x, m);
+      up.push([x, MY - m.U * p]); lo.push([x + m.sk * p, MY + m.D * p]);
+    }
+    function path() {
+      ctx.beginPath(); ctx.moveTo(up[0][0], up[0][1]);
+      for (var i = 1; i <= N; i++) ctx.lineTo(up[i][0], up[i][1]);
+      for (var j = N; j >= 0; j--) ctx.lineTo(lo[j][0], lo[j][1]);
+      ctx.closePath();
+    }
+    // a soft shadow on the skin around the opening, so it sits in the face
+    ctx.save(); path(); ctx.filter = 'blur(3px)'; ctx.strokeStyle = 'rgba(45,18,12,.2)'; ctx.lineWidth = 6; ctx.stroke(); ctx.restore();
+    ctx.save(); path(); ctx.clip();
+    var g = ctx.createRadialGradient(MX, MY + m.D * 0.5, 1, MX, MY + m.D * 0.35, Math.max(m.w, m.D));
+    g.addColorStop(0, '#060102'); g.addColorStop(0.35, '#1c0507'); g.addColorStop(0.75, '#4a1416'); g.addColorStop(1, '#73302d');
+    ctx.fillStyle = g; ctx.fillRect(MX - m.w - 2, MY - m.U - 2, m.w * 2 + 4, m.U + m.D + 6);
+    if (m.D > 14) {
+      var ty = MY + m.D * 0.8, tg = ctx.createRadialGradient(MX - 5, ty - m.D * 0.1, 1, MX, ty, m.w * 0.7);
+      tg.addColorStop(0, '#83393a'); tg.addColorStop(0.55, '#531a1d'); tg.addColorStop(1, '#1d0608');
+      ctx.fillStyle = tg; ctx.beginPath(); ctx.ellipse(MX, ty, m.w * 0.55, m.D * 0.28, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    // bare gums along the top and bottom
+    ctx.fillStyle = 'rgba(105,48,44,.8)';
+    ctx.beginPath(); up.forEach(function (pt, i) { ctx[i ? 'lineTo' : 'moveTo'](pt[0], pt[1]); });
+    for (var k = N; k >= 0; k--) ctx.lineTo(up[k][0], up[k][1] + 3.5 * profile(up[k][0], m)); ctx.fill();
+    // a couple of strings of saliva that snap as it opens wider
+    [[-12, 0.6], [16, 0.85]].forEach(function (sv, n) {
+      var a = 1 - smooth(sv[1] - 0.15, sv[1], m.o);
+      if (a < 0.03) return;
+      var x = MX + sv[0], p = profile(x, m), y0 = MY - m.U * p + 3, y1 = MY + m.D * p - 2;
+      if (y1 - y0 < 4) return;
+      ctx.strokeStyle = 'rgba(225,215,205,' + (0.22 * a).toFixed(2) + ')'; ctx.lineWidth = 0.7;
+      ctx.beginPath(); ctx.moveTo(x, y0); ctx.quadraticCurveTo(x + Math.sin(t * 2 + n) * 1.5, (y0 + y1) / 2 + (y1 - y0) * 0.18, x + 1, y1); ctx.stroke();
+    });
+    var sh = ctx.createLinearGradient(0, MY - m.U, 0, MY - m.U + 16);
+    sh.addColorStop(0, 'rgba(10,2,2,.65)'); sh.addColorStop(1, 'rgba(10,2,2,0)');
+    ctx.fillStyle = sh; ctx.fillRect(MX - m.w - 2, MY - m.U - 2, m.w * 2 + 4, 18);
+    // wet inner lip, then darkness just inside it
+    path(); ctx.strokeStyle = 'rgba(150,72,66,.5)'; ctx.lineWidth = 4; ctx.filter = 'blur(1px)'; ctx.stroke();
+    path(); ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.lineWidth = 6; ctx.filter = 'blur(2.5px)'; ctx.stroke();
+    ctx.restore();
+    ctx.save(); ctx.filter = 'blur(0.8px)'; ctx.strokeStyle = 'rgba(60,22,20,.4)'; ctx.lineWidth = 1.2; path(); ctx.stroke(); ctx.restore();
+  }
+
+  function create(img) {
+    var canvas = document.createElement('canvas'), ctx = canvas.getContext('2d');
+    var k = 0, dpr = 1;
+    canvas.style.display = 'block';
+    function size(px) {
+      var d = Math.min(2, window.devicePixelRatio || 1);
+      if (Math.abs(px / W - k) < 1e-4 && d === dpr) return;
+      k = px / W; dpr = d;
+      canvas.width = Math.round(W * k * dpr); canvas.height = Math.round((H + EXTRA) * k * dpr);
+      canvas.style.width = (W * k) + 'px'; canvas.style.height = ((H + EXTRA) * k) + 'px';
+    }
+    function draw(open, t, tremor) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.setTransform(k * dpr, 0, 0, k * dpr, 0, 0);
+      if (!(open > 0.003)) { ctx.drawImage(img, 0, 0, W, H); return; }
+      var m = shape(open, t || 0, tremor);
+      // the untouched head underneath, so no seams or slivers ever show through
+      ctx.drawImage(img, 0, 0, W, H);
+      mesh(ctx, img, TOP, MY, 5, warpUp, m);
+      mesh(ctx, img, MY, H, 8, warpLow, m);
+      drawMouth(ctx, m, t || 0);
+    }
+    function mouth(open) { return { x: MX, y: MY + 62 * Math.max(0, open) * 0.45 }; }
+    size(W);
+    return { canvas: canvas, size: size, draw: draw, mouth: mouth, W: W, H: H, EXTRA: EXTRA };
+  }
+  return { create: create };
+})();
+</script>
