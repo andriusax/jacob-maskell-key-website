@@ -27,6 +27,8 @@
       <ul class="navbar__group-list">
         <li><a href="{{ '/music-videos/' | relative_url }}">Direction</a></li>
         <li><a href="{{ '/commisions/' | relative_url }}">Commisions</a></li>
+        <li class="navbar__spacer" aria-hidden="true">&nbsp;</li>
+        <li><button type="button" class="navbar__delete-all" data-delete-all data-face="{{ site.data.home.hero_left | relative_url }}">delete all</button></li>
       </ul>
     </div>
 
@@ -37,13 +39,6 @@
         <li><a href="{{ '/contact/' | relative_url }}">Contact</a></li>
         <li><a href="{{ '/shop/' | relative_url }}">Shop</a></li>
         <li><a href="{{ '/press/' | relative_url }}">Press</a></li>
-      </ul>
-    </div>
-
-    <div class="navbar__group">
-      <span class="navbar__group-title">Other</span>
-      <ul class="navbar__group-list">
-        <li><button type="button" class="navbar__delete-all" data-delete-all data-face="{{ site.data.home.hero_left | relative_url }}">delete all</button></li>
       </ul>
     </div>
   </div>
