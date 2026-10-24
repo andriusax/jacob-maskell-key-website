@@ -16,6 +16,8 @@
     </main>
     {% include footer.html %}
   </div>
+  {% include face-warp.html %}
+  {% unless page.url == '/' or site.data.home.peek_head == false %}{% include peek-head.html %}{% endunless %}
   {% include delete-all.html %}
 </body>
 </html>
