@@ -13,6 +13,7 @@ content:
     path: _data/home.yml
     format: yaml
     fields:
+      - { name: peek_head, type: boolean, label: "Peeking head on the other pages", description: "On: 5 seconds after any page other than the homepage opens, Jacob's head peeks in from the edge of the screen. Clicking it makes it go away.", default: true }
       - { name: eyes_follow_cursor, type: boolean, label: "Eyes follow the cursor", description: "On: the left hero photo's eyes follow the cursor. This only works with the current photo of Jacob, so turn it off if you change the Left Hero Media.", default: true }
       - { name: hero_left, type: image, label: "Left Hero Media (gif or image)" }
       - { name: animate_hero_left, type: boolean, label: "Left photo: play animation", description: "On: the Left Hero Media gif plays. Off: it stays still on its first frame — the eyes still follow the cursor and blink. Only applies while 'Eyes follow the cursor' is on.", default: true }
