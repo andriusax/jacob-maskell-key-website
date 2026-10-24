@@ -5,3 +5,5 @@ _site/
 .bundle/
 vendor/
 .DS_Store
+# made by .github/scripts/hero_still.py during deploy
+assets/images/generated/
