@@ -1,5 +1,5 @@
 {% comment %}
-  On every page except the homepage: 5 seconds after the page opens, Jacob's
+  On every page except the homepage and About: 5 seconds after the page opens, Jacob's
   head slowly slides in from the side or bottom of the screen and stays there,
   half hidden, watching. Somewhere different each time. If the cursor comes
   close, his mouth starts to fall open (drawn by face-warp.html). Click it and
@@ -9,6 +9,8 @@
 <style>
   .peek-head { position: fixed; z-index: 45; margin: 0; padding: 0; border: 0; background: none; cursor: pointer;
     transform-origin: 50% 50%; -webkit-tap-highlight-color: transparent; }
+  /* fade the neck out below the chin, so the edge of the cut-out never shows */
+  .peek-head canvas { -webkit-mask-image: linear-gradient(to bottom, #000 66%, transparent 79%); mask-image: linear-gradient(to bottom, #000 66%, transparent 79%); }
   .peek-head:focus-visible { outline: 2px solid var(--color-heading, #0b0f2e); outline-offset: -6px; }
   html.da-busy .peek-head, html.chomp-ate .peek-head { display: none; }
 </style>
@@ -51,13 +53,13 @@
 
     // somewhere different every time: either side, or rising up from the bottom
     var edges = ['left', 'right', 'bottom'], edge = edges[Math.floor(Math.random() * edges.length)];
-    var tiltDeg = 16 + Math.random() * 14, out, peek;
+    var tiltDeg = 34 + Math.random() * 14, out, peek;
     if (edge === 'left') {
       btn.style.left = '0px'; btn.style.top = (innerHeight * (0.12 + Math.random() * 0.5)) + 'px';
-      out = 'translateX(-120%) rotate(' + tiltDeg + 'deg)'; peek = 'translateX(-46%) rotate(' + tiltDeg + 'deg)';
+      out = 'translateX(-130%) rotate(' + tiltDeg + 'deg)'; peek = 'translateX(-40%) rotate(' + tiltDeg + 'deg)';
     } else if (edge === 'right') {
       btn.style.right = '0px'; btn.style.top = (innerHeight * (0.12 + Math.random() * 0.5)) + 'px';
-      out = 'translateX(120%) rotate(' + (-tiltDeg) + 'deg)'; peek = 'translateX(46%) rotate(' + (-tiltDeg) + 'deg)';
+      out = 'translateX(130%) rotate(' + (-tiltDeg) + 'deg)'; peek = 'translateX(40%) rotate(' + (-tiltDeg) + 'deg)';
     } else {
       btn.style.bottom = '0px'; btn.style.left = (innerWidth * (0.08 + Math.random() * 0.78) - w / 2) + 'px';
       var lean = (Math.random() - 0.5) * 16;
