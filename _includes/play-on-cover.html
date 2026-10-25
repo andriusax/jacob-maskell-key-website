@@ -1,0 +1,86 @@
+{% comment %}
+  Play on the cover: hovering a cover shows a play button; clicking it slides
+  the official Bandcamp/Spotify player up over the bottom of the artwork.
+  Only one plays at a time; the × (or Esc) stops it. Players are only created
+  when clicked, so the page doesn't load 20 iframes up front.
+  Used with album-card-play.html.
+{% endcomment %}
+<style>
+  .play-card__cover { position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden;
+    background-size: cover; background-position: center; background-color: #C9C9C9; }
+  .play-card__link { position: absolute; inset: 0; }
+  .play-card__play { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0;
+    background: rgba(0, 0, 0, 0); cursor: pointer; transition: background .25s; }
+  .play-card__play svg { position: absolute; left: 50%; top: 50%; width: 76px; height: 76px; margin: -38px 0 0 -38px;
+    padding: 20px 18px 20px 22px; box-sizing: border-box; border-radius: 50%; fill: #fff;
+    background: rgba(11, 15, 46, .78); box-shadow: 0 6px 24px rgba(0, 0, 0, .25);
+    opacity: 0; transform: scale(.85); transition: opacity .25s, transform .25s; }
+  .play-card__cover:hover .play-card__play, .play-card__play:focus-visible { background: rgba(0, 0, 0, .18); }
+  .play-card__cover:hover .play-card__play svg, .play-card__play:focus-visible svg { opacity: 1; transform: none; }
+  .play-card__play:focus-visible { outline: 3px solid var(--color-link, #e8231f); outline-offset: -3px; }
+  /* phones and tablets have no hover: keep a smaller play button showing in the corner */
+  @media (hover: none) {
+    .play-card__play svg { opacity: .92; transform: none; width: 52px; height: 52px; padding: 14px 12px 14px 16px;
+      left: auto; top: auto; right: 12px; bottom: 12px; margin: 0; }
+  }
+  .play-card__player { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, .95);
+    transform: translateY(102%); transition: transform .35s cubic-bezier(.2, .7, .2, 1); }
+  .play-card__player iframe { display: block; width: 100%; border: 0; }
+  .play-card__close { position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; padding: 9px; border: 0;
+    border-radius: 50%; background: rgba(11, 15, 46, .78); cursor: pointer; opacity: 0; pointer-events: none;
+    transition: opacity .2s; }
+  .play-card__close svg { width: 100%; height: 100%; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; fill: none; }
+  .play-card.is-playing .play-card__play { pointer-events: none; background: linear-gradient(to top, rgba(0,0,0,.35), rgba(0,0,0,0) 55%); }
+  .play-card.is-playing .play-card__play svg { opacity: 0; }
+  .play-card.is-playing .play-card__player { transform: none; }
+  .play-card.is-playing .play-card__close { opacity: 1; pointer-events: auto; }
+</style>
+<script>
+(function () {
+  var current = null;
+
+  function playerFor(card) {
+    var type = card.dataset.type, id = card.dataset.id, f = document.createElement('iframe');
+    if (type.indexOf('spotify-') === 0) {
+      f.src = 'https://open.spotify.com/embed/' + type.slice(8) + '/' + id + '?utm_source=generator&theme=0';
+      f.title = 'Spotify player';
+      f.style.height = '80px';
+      f.setAttribute('allow', 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture');
+    } else {
+      f.src = 'https://bandcamp.com/EmbeddedPlayer/' + type + '=' + id +
+        '/size=large/bgcol=ffffff/linkcol=e8231f/tracklist=false/artwork=none/transparent=true/';
+      f.title = 'Bandcamp player';
+      f.style.height = '120px';
+      f.setAttribute('seamless', '');
+      f.setAttribute('allow', 'autoplay');
+    }
+    f.loading = 'eager';
+    return f;
+  }
+
+  function stop(card) {
+    if (!card) return;
+    card.classList.remove('is-playing');
+    var slot = card.querySelector('.play-card__player');
+    // wait for the slide-down before removing the player (removing it stops the sound)
+    setTimeout(function () { if (!card.classList.contains('is-playing')) slot.innerHTML = ''; }, 350);
+    if (current === card) current = null;
+  }
+
+  function start(card) {
+    if (current && current !== card) stop(current);
+    var slot = card.querySelector('.play-card__player');
+    if (!slot.firstChild) slot.appendChild(playerFor(card));
+    card.classList.add('is-playing');
+    current = card;
+  }
+
+  document.addEventListener('click', function (e) {
+    var play = e.target.closest('.play-card__play');
+    if (play) { start(play.closest('.play-card')); return; }
+    var close = e.target.closest('.play-card__close');
+    if (close) stop(close.closest('.play-card'));
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') stop(current); });
+})();
+</script>

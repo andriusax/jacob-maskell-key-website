@@ -1,0 +1,56 @@
+{%- comment -%}
+  Album card where the music plays on the cover itself (see play-on-cover.html).
+  Works out which player to use from the normal Listen Link:
+  - Bandcamp: the id is looked up during the deploy (.github/scripts/bandcamp_ids.py)
+  - Spotify: the id is in the link already
+  Anything else (or a Bandcamp page that couldn't be read) just links out.
+{%- endcomment -%}
+{%- assign link = include.link | strip -%}
+{%- assign ptype = '' -%}{%- assign pid = '' -%}
+{%- assign bc = site.data.bandcamp_ids[link] -%}
+{%- if include.bc_id -%}
+  {%- assign ptype = include.bc_type | default: 'album' -%}{%- assign pid = include.bc_id -%}
+{%- elsif bc -%}
+  {%- assign ptype = bc.type -%}{%- assign pid = bc.id -%}
+{%- elsif link contains 'open.spotify.com/' -%}
+  {%- assign sp = link | split: 'open.spotify.com/' | last | split: '?' | first | split: '/' -%}
+  {%- if sp[0] contains 'intl-' -%}
+    {%- assign ptype = 'spotify-' | append: sp[1] -%}{%- assign pid = sp[2] -%}
+  {%- else -%}
+    {%- assign ptype = 'spotify-' | append: sp[0] -%}{%- assign pid = sp[1] -%}
+  {%- endif -%}
+{%- endif -%}
+{%- if link contains 'spotify.com' -%}{%- assign where = 'Spotify' -%}{%- elsif link contains 'bandcamp.com' -%}{%- assign where = 'Bandcamp' -%}{%- else -%}{%- assign where = 'Listen' -%}{%- endif -%}
+<div class="album-card play-card{% if pid != '' %} has-player{% endif %}"{% if pid != '' %} data-type="{{ ptype }}" data-id="{{ pid }}"{% endif %}>
+  <div class="play-card__cover" style="background-image: url('{{ include.image | relative_url }}');">
+    {%- if pid != '' %}
+    <button type="button" class="play-card__play" aria-label="Play {{ include.band | strip }} – {{ include.album | strip }}">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+    </button>
+    <div class="play-card__player"></div>
+    <button type="button" class="play-card__close" aria-label="Stop">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    {%- else %}
+    <a class="play-card__link" href="{{ link }}" target="_blank" rel="noopener noreferrer" aria-label="{{ include.band | strip }} – {{ include.album | strip }} on {{ where }}"></a>
+    {%- endif %}
+  </div>
+  <div class="album-card__info">
+    <div class="album-card__meta">
+      <span class="label">{{ include.label }}</span>
+      <span class="year">{{ include.year }}</span>
+    </div>
+    <div class="album-card__bottom">
+      <a class="album-card__titles" href="{{ link }}" target="_blank" rel="noopener noreferrer">
+        <span class="album-card__band">{{ include.band }}</span>
+        <span class="album-card__album">{{ include.album }}</span>
+      </a>
+      <span class="listen-btn-slot">
+        <a class="listen-btn" href="{{ link }}" target="_blank" rel="noopener noreferrer">
+          <span class="listen-btn__icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+          <span class="listen-btn__label">{{ where }}</span>
+        </a>
+      </span>
+    </div>
+  </div>
+</div>
