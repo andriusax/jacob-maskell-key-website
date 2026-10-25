@@ -18,6 +18,6 @@
   </div>
   {% include face-warp.html %}
   {% unless page.url == '/' or page.url == '/about/' or site.data.home.peek_head == false %}{% include peek-head.html %}{% endunless %}
-  {% include delete-all.html %}
+  {% if page.url == '/' %}{% include delete-all.html %}{% endif %}
 </body>
 </html>
