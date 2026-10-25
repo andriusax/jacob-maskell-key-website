@@ -14,13 +14,13 @@
   their original inline styles are put back at the end. Esc skips to the end.
 {% endcomment %}
 <style>
-  /* the "delete all" button in the navbar, dressed as a faded nav link; the spacer above it lines it up with Events/Press */
-  .navbar__spacer { visibility: hidden; }
-  .navbar__delete-all { appearance: none; background: none; border: 0; margin: 0; padding: 0; cursor: pointer; text-align: left;
-    font-family: var(--font-display); font-weight: 400; font-size: var(--size-body); line-height: var(--line-body); color: var(--color-link); }
-  .navbar__delete-all { opacity: .45; transition: opacity .2s; }
-  .navbar__delete-all:hover, .navbar__delete-all:focus-visible { opacity: 1; text-decoration: underline; }
-  .navbar__delete-all:focus-visible { outline: 2px solid var(--color-heading); outline-offset: 3px; }
+  /* the homepage's two easter-egg buttons under Video ("delete all" and the head-chase one),
+     dressed as faded nav links; navbar.html nudges each one sideways at random */
+  .navbar__egg { appearance: none; background: none; border: 0; margin: 0; padding: 0; cursor: pointer; text-align: left;
+    font-family: var(--font-display); font-weight: 400; font-size: var(--size-body); line-height: var(--line-body); color: var(--color-link);
+    text-transform: lowercase; opacity: .45; transition: opacity .2s; }
+  .navbar__egg:hover, .navbar__egg:focus-visible { opacity: 1; text-decoration: underline; }
+  .navbar__egg:focus-visible { outline: 2px solid var(--color-heading); outline-offset: 3px; }
 
   .da-face { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
   .da-face canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }

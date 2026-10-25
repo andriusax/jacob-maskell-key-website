@@ -27,8 +27,10 @@
       <ul class="navbar__group-list">
         <li><a href="{{ '/music-videos/' | relative_url }}">Direction</a></li>
         <li><a href="{{ '/commisions/' | relative_url }}">Commisions</a></li>
-        <li class="navbar__spacer" aria-hidden="true">&nbsp;</li>
-        <li><button type="button" class="navbar__delete-all" data-delete-all data-face="{{ site.data.home.hero_left | relative_url }}">delete all</button></li>
+        {%- if page.url == '/' %}
+        <li><button type="button" class="navbar__egg" data-chase-tab>psst</button></li>
+        <li><button type="button" class="navbar__egg navbar__delete-all" data-delete-all data-face="{{ site.data.home.hero_left | relative_url }}">delete all</button></li>
+        {%- endif %}
       </ul>
     </div>
 
@@ -43,3 +45,12 @@
     </div>
   </div>
 </nav>
+{%- if page.url == '/' %}
+<script>
+  // the two homepage easter-egg links sit a little off to one side, differently on every visit
+  document.querySelectorAll('.navbar__egg').forEach(function (b) {
+    b.style.position = 'relative';
+    b.style.left = ((Math.random() < 0.5 ? -1 : 1) * (10 + Math.random() * 32)).toFixed(0) + 'px';
+  });
+</script>
+{%- endif %}
