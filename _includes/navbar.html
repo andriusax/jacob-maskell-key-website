@@ -54,3 +54,36 @@
   });
 </script>
 {%- endif %}
+<style>
+  /* every so often the name glitches into SPOOKY-J for a split second (see script below) */
+  .navbar__name { position: relative; display: inline-block; }
+  .navbar__name.is-glitch { animation: name-jitter .09s steps(2) infinite; text-shadow: -2px 0 rgba(232, 35, 31, .75), 2px 0 rgba(0, 200, 255, .55); }
+  @keyframes name-jitter { 0% { transform: translate(0, 0); } 50% { transform: translate(-1px, 1px) skewX(-6deg); } 100% { transform: translate(1px, -1px); } }
+</style>
+<script>
+(function () {
+  var el = document.querySelector('.navbar__name');
+  if (!el || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  var REAL = el.textContent.trim(), ALT = 'SPOOKY-J', GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#%&*/<>?!0123456789';
+  el.setAttribute('aria-label', REAL + ' (Spooky-J)');
+  var busy = false;
+  function scramble(len) { var s = ''; for (var i = 0; i < len; i++) s += GLYPHS[Math.floor(Math.random() * GLYPHS.length)]; return s; }
+  function glitch() {
+    if (busy) return;
+    busy = true;
+    var steps = [
+      [scramble(REAL.length), 55], [scramble(ALT.length + 3), 45], [ALT, 220 + Math.random() * 380],
+      [scramble(ALT.length + 2), 45], [scramble(REAL.length), 55], [REAL, 0]
+    ];
+    if (Math.random() < 0.35) steps.splice(3, 0, [scramble(ALT.length), 35], [ALT, 140]);   // sometimes a double blink
+    el.classList.add('is-glitch');
+    (function next(i) {
+      el.textContent = steps[i][0];
+      if (i === steps.length - 1) { el.classList.remove('is-glitch'); busy = false; return; }
+      setTimeout(function () { next(i + 1); }, steps[i][1]);
+    })(0);
+  }
+  (function schedule() { setTimeout(function () { if (!document.hidden) glitch(); schedule(); }, 6000 + Math.random() * 9000); })();
+  el.addEventListener('mouseenter', glitch);
+})();
+</script>
