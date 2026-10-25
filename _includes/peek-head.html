@@ -1,5 +1,6 @@
 {% comment %}
-  On every page except the homepage and About: 5 seconds after the page opens, Jacob's
+  On pages other than the homepage and About, every now and then (not every
+  visit; see "how often" below), 10-25 seconds after the page opens, Jacob's
   head slowly slides in from the left or right side of the screen and stays there,
   half hidden, watching. Somewhere different each time. If the cursor comes
   close, his mouth starts to fall open (drawn by face-warp.html). Click it and
@@ -17,7 +18,15 @@
 <script>
 (function () {
   var SRC = '{{ "/assets/images/chomp-head.webp" | relative_url }}';
-  var DELAY = 5000;
+  // how often: at most once per browser session, and only on about 1 in 3
+  // page views until then; after someone clicks it away it stays away for 3 days
+  var CHANCE = 0.33;
+  var DELAY = 10000 + Math.random() * 15000;
+  var SEEN = 'jmk-peek-seen', GONE = 'jmk-peek-dismissed', REST = 3 * 24 * 3600 * 1000;
+  function store(kind, key, val) {
+    try { var s = window[kind]; if (val === undefined) return s.getItem(key); s.setItem(key, val); } catch (e) { return null; }
+  }
+  if (store('sessionStorage', SEEN) || Date.now() - (+store('localStorage', GONE) || 0) < REST || Math.random() > CHANCE) return;
   var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
@@ -63,6 +72,7 @@
     }
     btn.style.transform = out;
     document.body.appendChild(btn);
+    store('sessionStorage', SEEN, '1');
     void btn.offsetWidth;
     btn.style.transition = reduceMotion ? 'none' : 'transform 1.8s cubic-bezier(.25,.6,.2,1)';
     btn.style.transform = peek;
@@ -87,6 +97,7 @@
     btn.addEventListener('click', function () {
       if (gone) return;
       gone = true; want = 0;
+      store('localStorage', GONE, String(Date.now()));
       window.removeEventListener('pointermove', onMove);
       btn.style.transition = reduceMotion ? 'none' : 'transform .35s cubic-bezier(.5,0,.8,.4)';
       btn.style.transform = out;
