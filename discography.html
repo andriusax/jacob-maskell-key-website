@@ -9,7 +9,7 @@ permalink: /discography/
 
 <section class="card-grid">
   {% for album in site.data.discography %}
-    {% include album-card.html band=album.band album=album.album label=album.label year=album.year image=album.image link=album.link bc_type=album.bandcamp_type bc_id=album.bandcamp_id %}
+    {% include album-card-play.html band=album.band album=album.album label=album.label year=album.year image=album.image link=album.link bc_type=album.bandcamp_type bc_id=album.bandcamp_id %}
   {% endfor %}
 </section>
 
@@ -19,8 +19,8 @@ permalink: /discography/
 
 <section class="card-grid">
   {% for remix in site.data.remixes %}
-    {% include album-card.html band=remix.band album=remix.album label=remix.label year=remix.year image=remix.image link=remix.link bc_type=remix.bandcamp_type bc_id=remix.bandcamp_id %}
+    {% include album-card-play.html band=remix.band album=remix.album label=remix.label year=remix.year image=remix.image link=remix.link bc_type=remix.bandcamp_type bc_id=remix.bandcamp_id %}
   {% endfor %}
 </section>
 
-{% include bandcamp-player.html %}
+{% include play-on-cover.html %}
