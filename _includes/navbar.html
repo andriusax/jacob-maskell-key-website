@@ -56,17 +56,12 @@
 {%- endif %}
 <style>
   /* every so often the name glitches into Spooky-J for a split second (see script below);
-     on the homepage the photo shakes and the eyes dart at the same moment */
+     on the homepage the eyes dart around at the same moment */
   .navbar__name { position: relative; display: inline-block; }
   .navbar__name.is-glitch { white-space: nowrap; }
   .navbar__name.is-glitch { animation: name-jitter .1s steps(2) infinite; text-shadow: -1px 0 rgba(232, 35, 31, .45), 1px 0 rgba(0, 170, 255, .35); }
   @keyframes name-jitter { 0% { transform: translate(0, 0); } 50% { transform: translate(-1px, .5px); } 100% { transform: translate(1px, -.5px); } }
-  .hero-eyes.is-glitch { animation: face-shake .12s linear infinite; }
-  @keyframes face-shake {
-    0% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-2px, 1px) rotate(-.4deg); }
-    50% { transform: translate(2px, -1px) rotate(.3deg); } 75% { transform: translate(-1px, -1px) rotate(.2deg); } 100% { transform: translate(1px, 1px) rotate(-.2deg); }
-  }
-  @media (prefers-reduced-motion: reduce) { .navbar__name.is-glitch, .hero-eyes.is-glitch { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .navbar__name.is-glitch { animation: none; } }
 </style>
 <script>
 (function () {
@@ -109,7 +104,6 @@
     // looked up now, because this script runs before the rest of the page exists
     var face = document.querySelector('.hero-eyes'), irises = face && face.querySelector('.hero-eyes__irises');
     if (!face || calm) return;
-    face.classList.toggle('is-glitch', on);
     clearInterval(shakeTimer);
     if (on && irises) {
       shakeTimer = setInterval(function () {
