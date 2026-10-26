@@ -55,35 +55,92 @@
 </script>
 {%- endif %}
 <style>
-  /* every so often the name glitches into SPOOKY-J for a split second (see script below) */
+  /* every so often the name glitches into Spooky-J for a split second (see script below);
+     on the homepage the photo shakes and the eyes dart at the same moment */
   .navbar__name { position: relative; display: inline-block; }
-  .navbar__name.is-glitch { animation: name-jitter .09s steps(2) infinite; text-shadow: -2px 0 rgba(232, 35, 31, .75), 2px 0 rgba(0, 200, 255, .55); }
-  @keyframes name-jitter { 0% { transform: translate(0, 0); } 50% { transform: translate(-1px, 1px) skewX(-6deg); } 100% { transform: translate(1px, -1px); } }
+  .navbar__name.is-glitch { white-space: nowrap; }
+  .navbar__name.is-glitch { animation: name-jitter .1s steps(2) infinite; text-shadow: -1px 0 rgba(232, 35, 31, .45), 1px 0 rgba(0, 170, 255, .35); }
+  @keyframes name-jitter { 0% { transform: translate(0, 0); } 50% { transform: translate(-1px, .5px); } 100% { transform: translate(1px, -.5px); } }
+  .hero-eyes.is-glitch { animation: face-shake .12s linear infinite; }
+  @keyframes face-shake {
+    0% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-2px, 1px) rotate(-.4deg); }
+    50% { transform: translate(2px, -1px) rotate(.3deg); } 75% { transform: translate(-1px, -1px) rotate(.2deg); } 100% { transform: translate(1px, 1px) rotate(-.2deg); }
+  }
+  @media (prefers-reduced-motion: reduce) { .navbar__name.is-glitch, .hero-eyes.is-glitch { animation: none; } }
 </style>
 <script>
 (function () {
   var el = document.querySelector('.navbar__name');
-  if (!el || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
-  var REAL = el.textContent.trim(), ALT = 'SPOOKY-J', GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#%&*/<>?!0123456789';
+  if (!el) return;
+  var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var REAL = el.textContent.trim(), ALT = 'Spooky-J';
+  // glyphs drawn from the two names themselves, so the in-between text stays in the same type
+  var POOL = 'JacobMaskellKeySpookyJ' + 'acobaskelleypookyeoa' + 'JMKSPY-';
   el.setAttribute('aria-label', REAL + ' (Spooky-J)');
   var busy = false;
-  function scramble(len) { var s = ''; for (var i = 0; i < len; i++) s += GLYPHS[Math.floor(Math.random() * GLYPHS.length)]; return s; }
+
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  function pick() { return POOL[Math.floor(Math.random() * POOL.length)]; }
+  function noise(len) { var s = ''; for (var i = 0; i < len; i++) s += Math.random() < 0.08 ? ' ' : pick(); return s; }
+  // a few different ways to get from one name to the other, picked at random each time
+  function frames(from, to) {
+    var n = Math.floor(rnd(3, 8)), out = [], style = Math.floor(Math.random() * 4), i, k, s;
+    for (i = 1; i <= n; i++) {
+      var p = i / (n + 1), len = Math.round(from.length + (to.length - from.length) * p + rnd(-2, 3));
+      len = Math.max(3, Math.min(REAL.length, len));
+      if (style === 0) {            // decodes left to right
+        k = Math.floor(to.length * p); s = to.slice(0, k) + noise(Math.max(0, len - k));
+      } else if (style === 1) {     // letters lock in at random
+        s = ''; for (k = 0; k < len; k++) s += (k < to.length && Math.random() < p) ? to[k] : pick();
+      } else if (style === 2) {     // the two names spliced together
+        k = Math.floor(rnd(1, Math.min(from.length, to.length)));
+        s = Math.random() < 0.5 ? from.slice(0, k) + to.slice(k) : to.slice(0, k) + from.slice(k);
+        if (Math.random() < 0.5) s = s.slice(0, Math.floor(rnd(3, s.length))) + noise(Math.floor(rnd(0, 3)));
+      } else {                      // pure static
+        s = noise(len);
+      }
+      out.push([s, rnd(28, 85)]);
+    }
+    return out;
+  }
+
+  var shakeTimer = 0;
+  function shake(on) {
+    // looked up now, because this script runs before the rest of the page exists
+    var face = document.querySelector('.hero-eyes'), irises = face && face.querySelector('.hero-eyes__irises');
+    if (!face || calm) return;
+    face.classList.toggle('is-glitch', on);
+    clearInterval(shakeTimer);
+    if (on && irises) {
+      shakeTimer = setInterval(function () {
+        irises.setAttribute('transform', 'translate(' + rnd(-4, 4).toFixed(1) + ' ' + rnd(-2.5, 2.5).toFixed(1) + ')');
+      }, 45);
+    } else if (irises) {
+      irises.removeAttribute('transform');
+    }
+  }
+
   function glitch() {
     if (busy) return;
     busy = true;
-    var steps = [
-      [scramble(REAL.length), 55], [scramble(ALT.length + 3), 45], [ALT, 220 + Math.random() * 380],
-      [scramble(ALT.length + 2), 45], [scramble(REAL.length), 55], [REAL, 0]
-    ];
-    if (Math.random() < 0.35) steps.splice(3, 0, [scramble(ALT.length), 35], [ALT, 140]);   // sometimes a double blink
-    el.classList.add('is-glitch');
+    var steps = calm ? [] : frames(REAL, ALT);
+    steps.push([ALT, rnd(260, 720)]);
+    if (!calm && Math.random() < 0.35) {           // sometimes it blinks back and forth
+      steps = steps.concat(frames(ALT, REAL).slice(0, 2), [[REAL, rnd(60, 140)]], frames(REAL, ALT).slice(-2), [[ALT, rnd(150, 350)]]);
+    }
+    steps = steps.concat(calm ? [] : frames(ALT, REAL), [[REAL, 0]]);
+    if (!calm) el.classList.add('is-glitch');
+    shake(true);
     (function next(i) {
       el.textContent = steps[i][0];
-      if (i === steps.length - 1) { el.classList.remove('is-glitch'); busy = false; return; }
+      if (i === steps.length - 1) { el.classList.remove('is-glitch'); shake(false); busy = false; return; }
       setTimeout(function () { next(i + 1); }, steps[i][1]);
     })(0);
   }
-  (function schedule() { setTimeout(function () { if (!document.hidden) glitch(); schedule(); }, 6000 + Math.random() * 9000); })();
+
+  // first one shortly after the page opens (so it's seen on phones too), then every 6-15 s
+  setTimeout(function first() { if (!document.hidden) glitch(); schedule(); }, rnd(1800, 3200));
+  function schedule() { setTimeout(function () { if (!document.hidden) glitch(); schedule(); }, rnd(6000, 15000)); }
   el.addEventListener('mouseenter', glitch);
 })();
 </script>
