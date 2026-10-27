@@ -770,6 +770,10 @@ a { color: inherit; text-decoration: none; }
 
 /* ---------------------------------------------
    Gig rows + toggle
+   Cut-out / collage look to match the homepage photo: each gig is a
+   white paper ticket stub with scissor-cut edges, stuck on slightly crooked.
+   No rounded corners, no pills, no shadows. Hover straightens it and the
+   city glitches like the navbar name.
 --------------------------------------------- */
 .gigs-page-header {
   display: flex;
@@ -780,53 +784,66 @@ a { color: inherit; text-decoration: none; }
 }
 
 .gigs-toggle {
-  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
-  padding: 4px;
-  gap: 2px;
-  background: var(--color-heading);
-  border-radius: 32px;
+  gap: 6px;
   margin: 0 0 -20px;
 }
 
 .gigs-toggle button {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: 700;
   font-size: var(--size-body);
   line-height: var(--line-body);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   border: 0;
+  border-radius: 0;
   cursor: pointer;
-  padding: 11px 28px;
-  border-radius: 32px;
+  padding: 10px 18px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.65);
-  transition: background 0.15s ease, color 0.15s ease;
+  color: var(--color-muted);
+  transition: color 0.15s ease, background 0.15s ease, transform 0.2s ease;
 }
 
-.gigs-toggle button:hover { color: var(--color-white); }
+.gigs-toggle button:hover { color: var(--color-heading); }
 
 .gigs-toggle button.is-active {
   background: var(--color-white);
   color: var(--color-heading);
+  transform: rotate(-2.5deg);
+  clip-path: polygon(0 3px, 100% 0, calc(100% - 2px) 100%, 2px calc(100% - 1px));
 }
 
-.gig-list { display: flex; flex-direction: column; gap: 10px; padding-bottom: 64px; }
+.gigs-toggle button:last-child.is-active { transform: rotate(2deg); }
+
+.gig-list { display: flex; flex-direction: column; gap: 14px; padding: 8px 0 64px; }
 
 .gig-row {
+  --tilt: -0.5deg;
+  --nudge: 0px;
+  position: relative;
   display: flex;
   align-items: center;
   gap: 24px;
   background: var(--color-white);
-  border: 1px solid rgba(0, 8, 49, 0.08);
-  box-shadow: 0px 2px 10px rgba(0, 8, 49, 0.06);
-  border-radius: 12px;
-  padding: 16px 24px;
+  padding: 16px 24px 16px 0;
   flex-wrap: wrap;
   text-decoration: none;
-  transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease,
-    opacity 0.22s ease, filter 0.22s ease;
+  color: var(--color-heading);
+  transform: translateX(var(--nudge)) rotate(var(--tilt));
+  /* slightly uneven scissor cut */
+  clip-path: polygon(0 2px, 38% 0, 100% 3px, calc(100% - 2px) calc(100% - 1px), 61% 100%, 3px calc(100% - 3px));
+  transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1), opacity 0.22s ease, filter 0.22s ease;
 }
+
+/* every strip stuck on a bit differently */
+.gig-row:nth-child(4n+2) { --tilt: 0.45deg; --nudge: 6px;
+  clip-path: polygon(2px 0, 100% 2px, 100% calc(100% - 3px), 44% 100%, 0 calc(100% - 1px)); }
+.gig-row:nth-child(4n+3) { --tilt: -0.25deg; --nudge: -4px;
+  clip-path: polygon(0 1px, 57% 3px, calc(100% - 3px) 0, 100% 100%, 22% calc(100% - 2px), 2px 100%); }
+.gig-row:nth-child(4n+4) { --tilt: 0.7deg; --nudge: 3px;
+  clip-path: polygon(3px 3px, 100% 0, calc(100% - 1px) calc(100% - 2px), 0 100%); }
 
 .gig-row.is-fading {
   opacity: 0;
@@ -834,51 +851,121 @@ a { color: inherit; text-decoration: none; }
   transform: translateY(6px) !important;
 }
 
-.gig-row:hover {
-  box-shadow: 0px 6px 20px rgba(0, 8, 49, 0.12);
-  border-color: rgba(0, 8, 49, 0.15);
-  transform: translateY(-1px);
-}
-
+/* ticket stub: date, then a perforated line */
 .gig-row__col {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 2px;
+  align-self: stretch;
+  justify-content: center;
+  margin: -16px 0;
+  padding: 16px 0;
+  border-right: 2px dashed var(--color-bg);
 }
 
-.gig-row__year { font-family: var(--font-display); font-weight: 400; font-size: 12px; line-height: 14px; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.04em; }
-.gig-row__date { font-family: var(--font-display); font-weight: 600; font-size: var(--size-body); line-height: var(--line-body); color: var(--color-heading); }
+.gig-row__date {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 34px;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-heading);
+}
+
+.gig-row__year {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+}
 
 .gig-row__place { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 160px; }
-.gig-row__city { font-family: var(--font-display); font-weight: 600; font-size: var(--size-body); line-height: var(--line-body); color: var(--color-heading); }
-.gig-row__venue { font-family: var(--font-display); font-weight: 400; font-size: var(--size-caption); line-height: var(--line-caption); color: var(--color-muted); }
 
-.gig-row__project {
+.gig-row__city {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: 700;
+  font-size: 19px;
+  line-height: 23px;
+  color: var(--color-heading);
+}
+
+.gig-row__venue {
+  font-family: var(--font-display);
+  font-weight: 400;
   font-size: var(--size-caption);
   line-height: var(--line-caption);
-  color: var(--color-link);
-  background: rgba(234, 27, 27, 0.08);
-  padding: 6px 12px;
-  border-radius: 20px;
-  white-space: nowrap;
+  color: var(--color-muted);
 }
+
+/* project = a little red label sticker slapped on */
+.gig-row__project {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-white);
+  background: var(--color-link);
+  padding: 6px 10px 5px;
+  white-space: nowrap;
+  transform: rotate(-3deg);
+  clip-path: polygon(0 1px, 100% 0, calc(100% - 1px) 100%, 1px calc(100% - 2px));
+  transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.gig-row:nth-child(even) .gig-row__project { transform: rotate(2deg); }
 
 .gig-row__arrow {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
-  color: var(--color-muted);
-  transition: transform 0.15s ease, color 0.15s ease;
+  color: var(--color-heading);
+  transition: transform 0.2s ease, color 0.15s ease;
 }
 
-.gig-row:hover .gig-row__arrow { color: var(--color-heading); transform: translateX(3px); }
+@keyframes gig-jitter {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(-1px, 0.5px); }
+  100% { transform: translate(1px, -0.5px); }
+}
+
+/* Hover: the strip straightens and lifts, the city glitches like the navbar name.
+   Only on real pointers, so a tap on mobile doesn't trigger it. */
+@media (hover: hover) and (pointer: fine) {
+  .gig-row:hover { transform: translateX(var(--nudge)) rotate(0deg) scale(1.015); }
+  .gig-row:hover .gig-row__city {
+    animation: gig-jitter 0.1s steps(2) infinite;
+    text-shadow: -1px 0 rgba(232, 35, 31, 0.45), 1px 0 rgba(0, 170, 255, 0.35);
+  }
+  .gig-row:hover .gig-row__project { transform: rotate(-6deg) scale(1.08); }
+  .gig-row:hover .gig-row__arrow { color: var(--color-link); transform: translate(3px, -3px); }
+}
+
+/* Past gigs: older, slightly faded paper */
+.gig-row[data-status="past"] { background: #F4F2EE; }
+.gig-row[data-status="past"] .gig-row__date { color: var(--color-muted); }
 
 @media (max-width: 760px) {
-  .gig-row { gap: 12px; padding: 14px 18px; }
-  .gig-row__venue { display: none; }
+  .gig-row { display: grid; grid-template-columns: auto 1fr; align-items: start;
+    gap: 8px 14px; padding: 14px 14px 14px 0; --nudge: 0px !important; }
+  .gig-row__col { grid-row: 1 / span 2; }
+  .gig-row__project { grid-column: 2; justify-self: start; }
+  .gig-row__col { margin: -14px 0; padding: 14px 0; }
+  .gig-row__date { font-size: 28px; line-height: 28px; }
+  .gig-row__city { font-size: 16px; line-height: 20px; }
+  .gig-row__project { white-space: normal; }
   .gig-row__arrow { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gig-row, .gig-row__project, .gig-row__arrow { transition: none; }
+  .gig-row:hover .gig-row__city { animation: none; }
 }
 
 /* ---------------------------------------------
@@ -1136,6 +1223,13 @@ button.listen-btn {
   color: var(--color-link);
 }
 
+.home-gigs__all {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  font-size: var(--size-caption);
+}
+
 .home-gigs__all:hover { text-decoration: underline; }
 
 .home-gigs .gig-list { padding-bottom: 0; }
@@ -1149,15 +1243,15 @@ button.listen-btn {
    lines up, however long the date is (e.g. "29 Dec" vs "3 Jan")
 --------------------------------------------- */
 .gig-row__col {
-  flex: 0 0 64px;
-  width: 64px;
+  flex: 0 0 92px;
+  width: 92px;
 }
 
 .gig-row__date,
 .gig-row__year { white-space: nowrap; }
 
 @media (max-width: 760px) {
-  .gig-row__col { flex-basis: 56px; width: 56px; }
+  .gig-row__col { flex-basis: 66px; width: 66px; }
 }
 /* ---------------------------------------------
    Live Projects: 2-up grid + one page per project
