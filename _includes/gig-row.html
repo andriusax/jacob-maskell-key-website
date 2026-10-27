@@ -4,8 +4,8 @@
 {% if gig_epoch >= today_epoch %}{% assign gig_status = "upcoming" %}{% endif %}
 <a class="gig-row" href="{{ include.link | default: '#' }}" data-status="{{ gig_status }}" target="_blank" rel="noopener noreferrer">
   <div class="gig-row__col">
-    <span class="gig-row__year">{{ include.date | date: "%Y" }}</span>
-    <span class="gig-row__date">{{ include.date | date: "%-d %b" }}</span>
+    <span class="gig-row__date">{{ include.date | date: "%d" }}</span>
+    <span class="gig-row__year">{{ include.date | date: "%b %Y" }}</span>
   </div>
 
   <div class="gig-row__place">
@@ -15,7 +15,7 @@
 
   <span class="gig-row__project">{{ include.project }}</span>
 
-  <svg class="gig-row__arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <svg class="gig-row__arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M7 17L17 7M8 7h9v9" stroke="currentColor" stroke-width="2.25" stroke-linecap="square"/>
   </svg>
 </a>
