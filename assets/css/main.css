@@ -1394,3 +1394,10 @@ a.poster:focus-visible { outline: 3px solid var(--color-link); outline-offset: -
   .kit-photos { grid-template-columns: 1fr; }
   .kit-file { flex-direction: column; align-items: stretch; }
 }
+.kit-tabs { display: flex; gap: 8px; margin: 0 0 32px; border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+.kit-tab { font-family: var(--font-display); font-weight: 600; font-size: var(--size-title); line-height: var(--line-title); color: var(--color-muted); padding: 0 4px 12px; margin-bottom: -1px; border-bottom: 3px solid transparent; }
+.kit-tab:hover { color: var(--color-heading); }
+.kit-tab.is-active { color: var(--color-heading); border-bottom-color: var(--color-link); }
+.kit-tab + .kit-tab { margin-left: 16px; }
+.kit-panel[hidden] { display: none; }
+.kit-contact { padding-bottom: 64px; }
