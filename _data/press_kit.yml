@@ -23,11 +23,11 @@ riders:
     note: "Tech rider, with the venue's in-house engineer"
     file: /assets/files/spooky-j-rider-in-house-engineer.pdf
   - project: Nihiloxica
-    title: "Nihiloxica (WITH DRUM KIT)"
+    title: "Nihiloxica (NO DRUM KIT)"
     note: "Full rider 2026, venue provides the drum kit"
     file: /assets/files/nihiloxica-rider-2026-drum-kit-provided.pdf
   - project: Nihiloxica
-    title: "Nihiloxica (NO DRUM KIT)"
+    title: "Nihiloxica (WITH DRUM KIT)"
     note: "Full rider 2026, we bring our own drum kit"
     file: /assets/files/nihiloxica-rider-2026-own-drum-kit.pdf
 photos:
