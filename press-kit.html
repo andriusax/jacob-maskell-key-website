@@ -1,0 +1,116 @@
+---
+layout: default
+title: Press Kit
+permalink: /press-kit/
+# Unlisted: not in the navbar, and asks search engines not to index it.
+# Anyone with the link can open it.
+noindex: true
+sitemap: false
+---
+{%- assign kit = site.data.press_kit -%}
+<section class="page-header">
+  <h1 class="hero-display">Press Kit</h1>
+  {%- if kit.intro and kit.intro != "" %}
+  <p class="body-text-light kit-intro">{{ kit.intro }}</p>
+  {%- endif %}
+</section>
+
+<div class="kit">
+  {%- assign riders = kit.riders | where_exp: "r", "r.file and r.file != ''" -%}
+  {%- if riders.size > 0 %}
+  <section class="kit-section">
+    <h2 class="title">Riders</h2>
+    <ul class="kit-files">
+      {%- for r in riders %}
+      <li class="kit-file">
+        <div class="kit-file__text">
+          <span class="body-text">{{ r.title }}</span>
+          {%- if r.note and r.note != "" %}<span class="caption kit-muted">{{ r.note }}</span>{% endif %}
+        </div>
+        <a class="pill-btn kit-btn" href="{{ r.file | relative_url }}" target="_blank" rel="noopener" download><i class="fa-solid fa-download"></i> Download</a>
+      </li>
+      {%- endfor %}
+    </ul>
+  </section>
+  {%- endif %}
+
+  {%- assign long_bio = kit.bio_long -%}
+  {%- if long_bio == nil or long_bio == "" %}{% assign long_bio = site.data.about.bio %}{% endif -%}
+  {%- if kit.bio_short != "" or long_bio != "" %}
+  <section class="kit-section">
+    <h2 class="title">Bio</h2>
+    {%- if kit.bio_short and kit.bio_short != "" %}
+    <div class="kit-bio">
+      <div class="kit-bio__head"><span class="caption kit-muted">Short</span><button type="button" class="kit-copy caption" data-copy="kit-bio-short"><i class="fa-regular fa-copy"></i> Copy</button></div>
+      <div class="kit-bio__text body-text-light" id="kit-bio-short">{{ kit.bio_short | markdownify }}</div>
+    </div>
+    {%- endif %}
+    {%- if long_bio and long_bio != "" %}
+    <div class="kit-bio">
+      <div class="kit-bio__head"><span class="caption kit-muted">Long</span><button type="button" class="kit-copy caption" data-copy="kit-bio-long"><i class="fa-regular fa-copy"></i> Copy</button></div>
+      <div class="kit-bio__text body-text-light" id="kit-bio-long">{{ long_bio | markdownify }}</div>
+    </div>
+    {%- endif %}
+  </section>
+  {%- endif %}
+
+  {%- assign photos = kit.photos | where_exp: "p", "p.image and p.image != ''" -%}
+  {%- if photos.size > 0 %}
+  <section class="kit-section">
+    <h2 class="title">Photos</h2>
+    <p class="caption kit-muted">Click a photo to download it in full size.</p>
+    <div class="kit-photos">
+      {%- for p in photos %}
+      <figure class="kit-photo">
+        <a href="{{ p.image | relative_url }}" download target="_blank" rel="noopener">
+          <img src="{{ p.image | relative_url }}" alt="{{ p.credit | default: 'Jacob Maskell-Key' | escape }}" loading="lazy">
+        </a>
+        {%- if p.credit and p.credit != "" %}<figcaption class="caption kit-muted">Photo: {{ p.credit }}</figcaption>{% endif %}
+      </figure>
+      {%- endfor %}
+    </div>
+  </section>
+  {%- endif %}
+
+  {%- assign downloads = kit.downloads | where_exp: "d", "d.file and d.file != ''" -%}
+  {%- if downloads.size > 0 %}
+  <section class="kit-section">
+    <h2 class="title">Logos &amp; other files</h2>
+    <ul class="kit-files">
+      {%- for d in downloads %}
+      <li class="kit-file">
+        <div class="kit-file__text">
+          <span class="body-text">{{ d.title }}</span>
+          {%- if d.note and d.note != "" %}<span class="caption kit-muted">{{ d.note }}</span>{% endif %}
+        </div>
+        <a class="pill-btn kit-btn" href="{{ d.file | relative_url }}" target="_blank" rel="noopener" download><i class="fa-solid fa-download"></i> Download</a>
+      </li>
+      {%- endfor %}
+    </ul>
+  </section>
+  {%- endif %}
+
+  {%- if kit.contact and kit.contact != "" %}
+  <section class="kit-section kit-contact body-text-light">
+    {{ kit.contact | markdownify }}
+  </section>
+  {%- endif %}
+</div>
+
+<script>
+  document.querySelectorAll('.kit-copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var el = document.getElementById(btn.getAttribute('data-copy'));
+      if (!el || !navigator.clipboard) return;
+      navigator.clipboard.writeText(el.innerText.trim()).then(function () {
+        var old = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+        setTimeout(function () { btn.innerHTML = old; }, 1600);
+      });
+    });
+  });
+  // links typed into the bios / contact text open in a new tab
+  document.querySelectorAll('.kit-bio__text a, .kit-contact a').forEach(function (a) {
+    if (a.hostname !== location.hostname) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+  });
+</script>
