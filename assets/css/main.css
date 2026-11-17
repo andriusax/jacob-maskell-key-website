@@ -1367,3 +1367,28 @@ a.poster:focus-visible { outline: 3px solid var(--color-link); outline-offset: -
 @media (prefers-reduced-motion: reduce) {
   a.poster img { transition: none; }
 }
+/* Press kit (press-kit.html): unlisted page for riders, bios, photos and logos */
+.kit-intro { margin-top: 16px; max-width: 720px; color: var(--color-muted); }
+.kit { display: flex; flex-direction: column; gap: 56px; padding: 0 0 64px; max-width: 960px; }
+.kit-section { display: flex; flex-direction: column; gap: 16px; }
+.kit-muted { color: var(--color-muted); }
+.kit-files { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.kit-file { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 20px; background: var(--color-white); border: 1px solid #E6E6E6; border-radius: 12px; }
+.kit-file__text { display: flex; flex-direction: column; gap: 4px; }
+.kit-btn { color: var(--color-white); gap: 8px; white-space: nowrap; }
+.kit-bio { background: var(--color-white); border: 1px solid #E6E6E6; border-radius: 12px; padding: 20px; }
+.kit-bio__head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; text-transform: uppercase; }
+.kit-bio__text p { margin: 0 0 12px; }
+.kit-bio__text p:last-child { margin-bottom: 0; }
+.kit-bio__text a, .kit-contact a { color: var(--color-link); }
+.kit-copy { background: none; border: 0; padding: 4px 0; cursor: pointer; color: var(--color-heading); font-family: var(--font-display); text-transform: none; }
+.kit-copy:hover { color: var(--color-link); }
+.kit-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.kit-photo { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.kit-photo img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 8px; transition: opacity .2s ease; }
+.kit-photo a:hover img { opacity: .85; }
+@media (max-width: 900px) { .kit-photos { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) {
+  .kit-photos { grid-template-columns: 1fr; }
+  .kit-file { flex-direction: column; align-items: stretch; }
+}
