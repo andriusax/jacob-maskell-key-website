@@ -206,3 +206,4 @@ content:
           - { name: note, type: string, label: "Note (optional)" }
           - { name: file, type: file, label: "File", options: { media: files } }
       - { name: contact, type: rich-text, label: "Contact line (bottom of page)", options: { format: markdown } }
+      - { name: photos_full_link, type: string, label: "Full-size photos link (Dropbox)", description: "Shows a Download full-size photos button under the Photos heading. Leave empty to hide it." }
