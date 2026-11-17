@@ -5,6 +5,12 @@ media:
     output: /assets/images/uploads
     rename: safe
     extensions: [png, jpg, jpeg, gif, webp]
+  - name: files
+    label: Files (riders, PDFs, logos)
+    input: assets/files
+    output: /assets/files
+    rename: safe
+    extensions: [pdf, zip, png, jpg, jpeg, svg, eps, ai, doc, docx]
 
 content:
   - name: home
@@ -164,3 +170,39 @@ content:
         label: "Gig names (optional)"
         description: "Gigs whose Project starts with this project's name show up on its page automatically. Only fill this in if the gigs use a different name, e.g. 'Dis Fig' for Dis Fig x Spooky-J."
         list: true
+
+  - name: press_kit
+    label: Press Kit (hidden page)
+    type: file
+    path: _data/press_kit.yml
+    format: yaml
+    fields:
+      - { name: intro, type: text, label: "Intro", description: "Short line at the top. This page is at jacobmkey.work/press-kit and isn't in the menu or on Google — send the link to whoever needs it." }
+      - name: riders
+        label: Riders
+        type: object
+        list: true
+        description: "Riders without an uploaded file don't show on the page."
+        fields:
+          - { name: title, type: string, label: "Project / title" }
+          - { name: note, type: string, label: "Note (optional)", description: "e.g. Tech rider + stage plot, updated Nov 2026" }
+          - { name: file, type: file, label: "File (PDF)", options: { media: files } }
+      - { name: bio_short, type: rich-text, label: "Short bio", options: { format: markdown } }
+      - { name: bio_long, type: rich-text, label: "Long bio", description: "Leave empty to use the bio from the About page.", options: { format: markdown } }
+      - name: photos
+        label: Press photos
+        type: object
+        list: true
+        description: "Upload full-size photos. Visitors click a photo to download it."
+        fields:
+          - { name: image, type: image, label: "Photo", options: { media: images } }
+          - { name: credit, type: string, label: "Photo credit (optional)" }
+      - name: downloads
+        label: Logos & other files
+        type: object
+        list: true
+        fields:
+          - { name: title, type: string }
+          - { name: note, type: string, label: "Note (optional)" }
+          - { name: file, type: file, label: "File", options: { media: files } }
+      - { name: contact, type: rich-text, label: "Contact line (bottom of page)", options: { format: markdown } }
