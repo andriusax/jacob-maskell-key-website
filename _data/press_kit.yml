@@ -2,16 +2,39 @@ intro: Riders, photos, bios and logos for promoters, venues and press. Anything 
 contact: "Booking and press: use the [contact form](/contact/)."
 riders:
   - title: "Spooky-J: solo drums & electronics"
-    note: "Tech rider + stage plot"
-    file: ""
+    note: "Tech rider, with my own sound engineer (Hayden Hook)"
+    file: /assets/files/spooky-j-rider-with-hayden.pdf
+  - title: "Spooky-J: solo drums & electronics"
+    note: "Tech rider, with the venue's in-house engineer"
+    file: /assets/files/spooky-j-rider-in-house-engineer.pdf
   - title: Nihiloxica
-    note: "Tech rider + stage plot"
-    file: ""
+    note: "Full rider 2026, venue provides the drum kit"
+    file: /assets/files/nihiloxica-rider-2026-drum-kit-provided.pdf
+  - title: Nihiloxica
+    note: "Full rider 2026, we bring our own drum kit"
+    file: /assets/files/nihiloxica-rider-2026-own-drum-kit.pdf
 bio_short: >-
   Jacob Maskell-Key is a multi-disciplined musician based in Amsterdam. He is
   the founder of the band Nihiloxica (Nyege Nyege Tapes, Crammed Discs) and
   produces under the alias Spooky-J, with releases on Blip Discs, Rocket
   Recordings and his own label Spooky Shit.
 bio_long: ""
-photos: []
+photos:
+  - image: /assets/files/spooky-j-album-promo.jpg
+    credit: ""
+  - image: /assets/files/nihiloxica-1-credit-marco-maezza.jpg
+    credit: Marco Maezza
+  - image: /assets/files/nihiloxica-2-credit-marco-maezza.jpg
+    credit: Marco Maezza
+  - image: /assets/files/nihiloxica-credit-jelmer-de-haas.jpg
+    credit: Jelmer de Haas
+  - image: /assets/files/nihiloxica-credit-tallulah-maskell-key.jpg
+    credit: Tallulah Maskell-Key
+  - image: /assets/files/nihiloxica-le-guess-who-36framez-1.jpg
+    credit: 36framez (Le Guess Who)
+  - image: /assets/files/nihiloxica-le-guess-who-36framez-2.jpg
+    credit: 36framez (Le Guess Who)
+  - image: /assets/files/nihiloxica-le-guess-who-36framez-3.jpg
+    credit: 36framez (Le Guess Who)
+photos_full_link: "https://www.dropbox.com/scl/fo/1jq37hicplsdn6h1zajcb/AIn5Hhj6vwbjrLI8DYZxc4Q?rlkey=2c05ezfbjxqzxodam1kx397mo&dl=0"
 downloads: []
