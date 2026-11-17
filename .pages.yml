@@ -187,6 +187,7 @@ content:
           - { name: name, type: string, label: "Tab name" }
           - { name: bio_short, type: rich-text, label: "Short bio", options: { format: markdown } }
           - { name: bio_long, type: rich-text, label: "Long bio", description: "On the first tab, leaving this empty uses the bio from the About page.", options: { format: markdown } }
+          - { name: photos_full_link, type: string, label: "Full-size photos link (Dropbox)", description: "Shows a Download full-size photos button under Photos on this tab. Leave empty to hide it." }
       - name: riders
         label: Riders
         type: object
