@@ -51,13 +51,13 @@ sitemap: false
     <h2 class="title">Bio</h2>
     {%- if short_bio != "" %}
     <div class="kit-bio">
-      <div class="kit-bio__head"><span class="caption kit-muted">Short</span><button type="button" class="kit-copy caption" data-copy="kit-bio-short-{{ slug }}"><i class="fa-regular fa-copy"></i> Copy</button></div>
+      <div class="kit-bio__head"><span class="caption kit-muted">{% if long_bio != "" %}Short{% endif %}</span><button type="button" class="kit-copy caption" data-copy="kit-bio-short-{{ slug }}"><i class="fa-regular fa-copy"></i> Copy</button></div>
       <div class="kit-bio__text body-text-light" id="kit-bio-short-{{ slug }}">{{ short_bio | markdownify }}</div>
     </div>
     {%- endif %}
     {%- if long_bio != "" %}
     <div class="kit-bio">
-      <div class="kit-bio__head"><span class="caption kit-muted">Long</span><button type="button" class="kit-copy caption" data-copy="kit-bio-long-{{ slug }}"><i class="fa-regular fa-copy"></i> Copy</button></div>
+      <div class="kit-bio__head"><span class="caption kit-muted">{% if short_bio != "" %}Long{% endif %}</span><button type="button" class="kit-copy caption" data-copy="kit-bio-long-{{ slug }}"><i class="fa-regular fa-copy"></i> Copy</button></div>
       <div class="kit-bio__text body-text-light" id="kit-bio-long-{{ slug }}">{{ long_bio | markdownify }}</div>
     </div>
     {%- endif %}
@@ -69,8 +69,9 @@ sitemap: false
   <section class="kit-section">
     <h2 class="title">Photos</h2>
     <p class="caption kit-muted">Click a photo to download it (web size, fine for press and online use).</p>
-    {%- if kit.photos_full_link and kit.photos_full_link != "" %}
-    <a class="pill-btn kit-btn kit-full" href="{{ kit.photos_full_link }}" target="_blank" rel="noopener"><i class="fa-solid fa-images"></i> Download full-size photos (print quality)</a>
+    {%- assign full_link = proj.photos_full_link | default: kit.photos_full_link | default: "" %}
+    {%- if full_link != "" %}
+    <a class="pill-btn kit-btn kit-full" href="{{ full_link }}" target="_blank" rel="noopener"><i class="fa-solid fa-images"></i> Download full-size photos (print quality)</a>
     {%- endif %}
     <div class="kit-photos">
       {%- for p in photos %}
