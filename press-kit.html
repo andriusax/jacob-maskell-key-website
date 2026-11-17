@@ -3,7 +3,7 @@ layout: default
 title: Press Kit
 permalink: /press-kit/
 # Unlisted: not in the navbar, and asks search engines not to index it.
-# Anyone with the link can open it.
+# Anyone with the link can open it. Each tab has its own link: /press-kit/#spooky-j, /press-kit/#nihiloxica
 noindex: true
 sitemap: false
 ---
@@ -15,8 +15,16 @@ sitemap: false
   {%- endif %}
 </section>
 
-<div class="kit">
-  {%- assign riders = kit.riders | where_exp: "r", "r.file and r.file != ''" -%}
+<div class="kit-tabs" role="tablist">
+  {%- for proj in kit.projects %}
+  <a class="kit-tab{% if forloop.first %} is-active{% endif %}" role="tab" href="#{{ proj.name | slugify }}" data-tab="{{ proj.name | slugify }}">{{ proj.name }}</a>
+  {%- endfor %}
+</div>
+
+{%- for proj in kit.projects %}
+{%- assign slug = proj.name | slugify %}
+<div class="kit kit-panel" role="tabpanel" id="panel-{{ slug }}" data-panel="{{ slug }}"{% unless forloop.first %} hidden{% endunless %}>
+  {%- assign riders = kit.riders | where: "project", proj.name | where_exp: "r", "r.file and r.file != ''" -%}
   {%- if riders.size > 0 %}
   <section class="kit-section">
     <h2 class="title">Riders</h2>
@@ -34,27 +42,29 @@ sitemap: false
   </section>
   {%- endif %}
 
-  {%- assign long_bio = kit.bio_long -%}
-  {%- if long_bio == nil or long_bio == "" %}{% assign long_bio = site.data.about.bio %}{% endif -%}
-  {%- if kit.bio_short != "" or long_bio != "" %}
+  {%- assign long_bio = proj.bio_long | default: "" -%}
+  {%- assign short_bio = proj.bio_short | default: "" -%}
+  {%- comment %} The first tab (Spooky-J) falls back to the About page bio {% endcomment -%}
+  {%- if forloop.first and long_bio == "" %}{% assign long_bio = site.data.about.bio | default: "" %}{% endif -%}
+  {%- if short_bio != "" or long_bio != "" %}
   <section class="kit-section">
     <h2 class="title">Bio</h2>
-    {%- if kit.bio_short and kit.bio_short != "" %}
+    {%- if short_bio != "" %}
     <div class="kit-bio">
-      <div class="kit-bio__head"><span class="caption kit-muted">Short</span><button type="button" class="kit-copy caption" data-copy="kit-bio-short"><i class="fa-regular fa-copy"></i> Copy</button></div>
-      <div class="kit-bio__text body-text-light" id="kit-bio-short">{{ kit.bio_short | markdownify }}</div>
+      <div class="kit-bio__head"><span class="caption kit-muted">Short</span><button type="button" class="kit-copy caption" data-copy="kit-bio-short-{{ slug }}"><i class="fa-regular fa-copy"></i> Copy</button></div>
+      <div class="kit-bio__text body-text-light" id="kit-bio-short-{{ slug }}">{{ short_bio | markdownify }}</div>
     </div>
     {%- endif %}
-    {%- if long_bio and long_bio != "" %}
+    {%- if long_bio != "" %}
     <div class="kit-bio">
-      <div class="kit-bio__head"><span class="caption kit-muted">Long</span><button type="button" class="kit-copy caption" data-copy="kit-bio-long"><i class="fa-regular fa-copy"></i> Copy</button></div>
-      <div class="kit-bio__text body-text-light" id="kit-bio-long">{{ long_bio | markdownify }}</div>
+      <div class="kit-bio__head"><span class="caption kit-muted">Long</span><button type="button" class="kit-copy caption" data-copy="kit-bio-long-{{ slug }}"><i class="fa-regular fa-copy"></i> Copy</button></div>
+      <div class="kit-bio__text body-text-light" id="kit-bio-long-{{ slug }}">{{ long_bio | markdownify }}</div>
     </div>
     {%- endif %}
   </section>
   {%- endif %}
 
-  {%- assign photos = kit.photos | where_exp: "p", "p.image and p.image != ''" -%}
+  {%- assign photos = kit.photos | where: "project", proj.name | where_exp: "p", "p.image and p.image != ''" -%}
   {%- if photos.size > 0 %}
   <section class="kit-section">
     <h2 class="title">Photos</h2>
@@ -66,7 +76,7 @@ sitemap: false
       {%- for p in photos %}
       <figure class="kit-photo">
         <a href="{{ p.image | relative_url }}" download target="_blank" rel="noopener">
-          <img src="{{ p.image | relative_url }}" alt="{{ p.credit | default: 'Jacob Maskell-Key' | escape }}" loading="lazy">
+          <img src="{{ p.image | relative_url }}" alt="{{ proj.name }}{% if p.credit and p.credit != '' %}, photo by {{ p.credit | escape }}{% endif %}" loading="lazy">
         </a>
         {%- if p.credit and p.credit != "" %}<figcaption class="caption kit-muted">Photo: {{ p.credit }}</figcaption>{% endif %}
       </figure>
@@ -75,7 +85,7 @@ sitemap: false
   </section>
   {%- endif %}
 
-  {%- assign downloads = kit.downloads | where_exp: "d", "d.file and d.file != ''" -%}
+  {%- assign downloads = kit.downloads | where: "project", proj.name | where_exp: "d", "d.file and d.file != ''" -%}
   {%- if downloads.size > 0 %}
   <section class="kit-section">
     <h2 class="title">Logos &amp; other files</h2>
@@ -92,15 +102,32 @@ sitemap: false
     </ul>
   </section>
   {%- endif %}
-
-  {%- if kit.contact and kit.contact != "" %}
-  <section class="kit-section kit-contact body-text-light">
-    {{ kit.contact | markdownify }}
-  </section>
-  {%- endif %}
 </div>
+{%- endfor %}
+
+{%- if kit.contact and kit.contact != "" %}
+<section class="kit-section kit-contact body-text-light">
+  {{ kit.contact | markdownify }}
+</section>
+{%- endif %}
 
 <script>
+  (function () {
+    var tabs = document.querySelectorAll('.kit-tab'), panels = document.querySelectorAll('.kit-panel');
+    function show(slug, push) {
+      var found = false;
+      panels.forEach(function (p) { var on = p.getAttribute('data-panel') === slug; p.hidden = !on; if (on) found = true; });
+      if (!found) return false;
+      tabs.forEach(function (t) { var on = t.getAttribute('data-tab') === slug; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on); });
+      if (push) history.replaceState(null, '', '#' + slug);
+      return true;
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener('click', function (e) { e.preventDefault(); show(t.getAttribute('data-tab'), true); });
+    });
+    // open the tab named in the link, e.g. /press-kit/#nihiloxica
+    if (location.hash) show(location.hash.slice(1).toLowerCase(), false);
+  })();
   document.querySelectorAll('.kit-copy').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var el = document.getElementById(btn.getAttribute('data-copy'));
