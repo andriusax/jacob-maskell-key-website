@@ -563,80 +563,80 @@
   project: AWICHAS
   link: https://www.bimhuis.nl/agenda/ibelisse-guardia-ferragutti-x-zalan-szakacs-becoming-mountain-awichas
 - date: 2027-01-05
-  city: "Osaka, Japan"
-  venue: "Sengoku Daitoryo"
+  city: Osaka, Japan
+  venue: Sengoku Daitoryo
   project: Spooky-J
-  link: "https://www.google.com/maps/search/?api=1&query=Sengoku+Daitoryo+Osaka+Japan"
+  link: https://www.google.com/maps/search/?api=1&query=Sengoku+Daitoryo+Osaka+Japan
 - date: 2027-01-07
-  city: "Okayama, Japan"
-  venue: "Pepperland"
+  city: Okayama, Japan
+  venue: Pepperland
   project: Spooky-J
-  link: "http://www.pepperland.net/"
+  link: http://www.pepperland.net/
 - date: 2027-01-08
-  city: "Hiroshima, Japan"
-  venue: "JIMO Cafe"
+  city: Hiroshima, Japan
+  venue: JIMO Cafe
   project: Spooky-J
-  link: "https://www.google.com/maps/search/?api=1&query=JIMO+Cafe+Hiroshima+Japan"
+  link: https://www.google.com/maps/search/?api=1&query=JIMO+Cafe+Hiroshima+Japan
 - date: 2027-01-14
-  city: "Kumamoto, Japan"
-  venue: "Navaro"
+  city: Kumamoto, Japan
+  venue: Navaro
   project: Spooky-J
-  link: "https://www.google.com/maps/search/?api=1&query=Navaro+Kumamoto+Japan"
+  link: https://www.google.com/maps/search/?api=1&query=Navaro+Kumamoto+Japan
 - date: 2027-01-15
-  city: "Kagoshima, Japan"
-  venue: "WORD UP! Studio"
+  city: Kagoshima, Japan
+  venue: WORD UP! Studio
   project: Spooky-J
-  link: "https://www.google.com/maps/search/?api=1&query=WORD+UP%21+Studio+Kagoshima+Japan"
+  link: https://www.google.com/maps/search/?api=1&query=WORD+UP%21+Studio+Kagoshima+Japan
 - date: 2027-01-16
-  city: "Oita, Japan"
-  venue: "AT HALL"
+  city: Oita, Japan
+  venue: AT HALL
   project: Spooky-J
-  link: "https://www.google.com/maps/search/?api=1&query=AT+HALL+Oita+Japan"
+  link: https://www.google.com/maps/search/?api=1&query=AT+HALL+Oita+Japan
 - date: 2027-01-19
-  city: "Shimanto, Japan"
-  venue: "Taiyo No Me"
+  city: Shimanto, Japan
+  venue: Taiyo No Me
   project: Spooky-J
-  link: "https://www.google.com/maps/search/?api=1&query=Taiyo+No+Me+Shimanto+Japan"
+  link: https://www.google.com/maps/search/?api=1&query=Taiyo+No+Me+Shimanto+Japan
 - date: 2027-01-20
-  city: "Takamatsu, Japan"
-  venue: "Toonice"
+  city: Takamatsu, Japan
+  venue: Toonice
   project: Spooky-J
-  link: "https://www.google.com/maps/search/?api=1&query=Toonice+Takamatsu+Japan"
+  link: https://www.google.com/maps/search/?api=1&query=Toonice+Takamatsu+Japan
 - date: 2027-01-21
-  city: "Tokushima, Japan"
-  venue: "Txalaparta"
+  city: Tokushima, Japan
+  venue: Txalaparta
   project: Spooky-J
-  link: "https://www.google.com/maps/search/?api=1&query=Txalaparta+Tokushima+Japan"
+  link: https://www.google.com/maps/search/?api=1&query=Txalaparta+Tokushima+Japan
 - date: 2027-01-23
-  city: "Osaka, Japan"
-  venue: "Environment 0g"
+  city: Osaka, Japan
+  venue: Environment 0g
   project: Spooky-J
-  link: "https://www.google.com/maps/search/?api=1&query=Environment+0g+Osaka+Japan"
+  link: https://www.google.com/maps/search/?api=1&query=Environment+0g+Osaka+Japan
 - date: 2027-01-24
-  city: "Kyoto, Japan"
-  venue: "Socrates"
+  city: Kyoto, Japan
+  venue: Socrates
   project: Spooky-J
-  link: "https://www.instagram.com/socrates_kyoto/"
+  link: https://www.instagram.com/socrates_kyoto/
 - date: 2027-01-25
-  city: "Osaka, Japan"
-  venue: "HOKAGE"
+  city: Osaka, Japan
+  venue: HOKAGE
   project: Spooky-J
-  link: "https://www.google.com/maps/search/?api=1&query=HOKAGE+Osaka+Japan"
+  link: https://www.google.com/maps/search/?api=1&query=HOKAGE+Osaka+Japan
 - date: 2027-01-26
-  city: "Nagoya, Japan"
-  venue: "ZION"
+  city: Nagoya, Japan
+  venue: ZION
   project: Spooky-J
-  link: "https://www.google.com/maps/search/?api=1&query=ZION+Nagoya+Japan"
+  link: https://www.google.com/maps/search/?api=1&query=ZION+Nagoya+Japan
 - date: 2027-01-27
-  city: "Nagoya, Japan"
-  venue: "Nanya"
+  city: Nagoya, Japan
+  venue: Nanya
   project: Spooky-J
-  link: "https://www.google.com/maps/search/?api=1&query=Nanya+Nagoya+Japan"
+  link: https://www.google.com/maps/search/?api=1&query=Nanya+Nagoya+Japan
 - date: 2027-01-31
-  city: "Tokyo, Japan"
-  venue: "Moonstep"
+  city: Tokyo, Japan
+  venue: Moonstep
   project: Spooky-J
-  link: "https://nakano-dynamite.com/moonstep/"
+  link: https://nakano-dynamite.com/moonstep/
 - date: 2025-07-04
   city: Rotterdam, The Netherlands
   venue: WORM
@@ -785,3 +785,8 @@
   city: London, UK
   venue: Jazz Café
   project: Ronald Langestraat
+- date: 2026-12-21
+  city: Amsterdam
+  venue: Bimhuis
+  project: Freejazz Bingo w/ Luc Ex
+  link: https://www.bimhuis.nl/en/calendar/an-absurdist-intergalactic-night-maartje-wortel-diane-mahin-lukraak-freejazz-bingo
