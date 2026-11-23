@@ -1,39 +1,46 @@
-intro: Riders, photos, bios and logos for promoters, venues and press. Anything missing? Get in touch.
-contact: "Booking and press: use the [contact form](/contact/)."
+intro: Riders, photos, bios and logos for promoters, venues and press. Anything
+  missing? Get in touch.
 projects:
   - name: Spooky-J
-    bio_short: >-
-      Jacob Maskell-Key is a multi-disciplined musician based in Amsterdam. He is
-      the founder of the band Nihiloxica (Nyege Nyege Tapes, Crammed Discs) and
-      produces under the alias Spooky-J, with releases on Blip Discs, Rocket
-      Recordings and his own label Spooky Shit.
-    bio_long: ""
-    photos_full_link: "https://www.dropbox.com/scl/fo/3kyzkr6v9ykl4l99290yp/ABBMoybjnaHj15dEg--1dvw?rlkey=isp3t5260bb9q918gr8wwpw8s&dl=0"
+    bio_short: Jacob Maskell-Key is a multi-disciplined musician based in Amsterdam.
+      He is the founder of the band Nihiloxica (Nyege Nyege Tapes, Crammed
+      Discs) and produces under the alias Spooky-J, with releases on Blip Discs,
+      Rocket Recordings and his own label Spooky Shit.
+    photos_full_link: https://www.dropbox.com/scl/fo/3kyzkr6v9ykl4l99290yp/ABBMoybjnaHj15dEg--1dvw?rlkey=isp3t5260bb9q918gr8wwpw8s&dl=0
   - name: Nihiloxica
-    bio_short: ""
-    bio_long: "Treading a fine (and erratic) line between traditional Bugandan drum music, industrial post-punk, and club-ready rave music, Nihiloxica are a group like no other. It is the outcome of a collaboration between Ugandan drummers Henry Isabirye, Henry Kasoma, and Jamiru Mwanje, UK-based producer Pete Jones (pq), and the Amsterdam-based producer Jacob Maskell-Key (Spooky-J). Their self-titled debut EP released with Nyege Nyege Tapes in 2017 to widespread critical acclaim, leading to a debut performance as headliners at Nyege Nyege Festival that year. Guiding listeners into a trance, their more-than-techno sounds create hypnotic pathways into altered states. Dark techno ambience is ruptured by booming percussion, and traditional Engalabi and Bakisimba drums meld with synthesisers and electronics in Nihiloxica’s otherworldly music."
-    photos_full_link: "https://www.dropbox.com/scl/fo/pz43i4638d0zlnajo738c/AHeP4ewgjA2-ZBssI5DVPhY?rlkey=q8nuj98itsh4bbcd6nh6nv9hb&dl=0"
+    bio_long: Treading a fine (and erratic) line between traditional Bugandan drum
+      music, industrial post-punk, and club-ready rave music, Nihiloxica are a
+      group like no other. It is the outcome of a collaboration between Ugandan
+      drummers Henry Isabirye, Henry Kasoma, and Jamiru Mwanje, UK-based
+      producer Pete Jones (pq), and the Amsterdam-based producer Jacob
+      Maskell-Key (Spooky-J). Their self-titled debut EP released with Nyege
+      Nyege Tapes in 2017 to widespread critical acclaim, leading to a debut
+      performance as headliners at Nyege Nyege Festival that year. Guiding
+      listeners into a trance, their more-than-techno sounds create hypnotic
+      pathways into altered states. Dark techno ambience is ruptured by booming
+      percussion, and traditional Engalabi and Bakisimba drums meld with
+      synthesisers and electronics in Nihiloxica’s otherworldly music.
+    photos_full_link: https://www.dropbox.com/scl/fo/pz43i4638d0zlnajo738c/AHeP4ewgjA2-ZBssI5DVPhY?rlkey=q8nuj98itsh4bbcd6nh6nv9hb&dl=0
 riders:
   - project: Spooky-J
-    title: "Spooky-J: solo drums & electronics"
-    note: "Tech rider, with my own sound engineer (Hayden Hook)"
-    file: /assets/files/spooky-j-rider-with-hayden.pdf
-  - project: Spooky-J
-    title: "Spooky-J: solo drums & electronics"
-    note: "Tech rider, with the venue's in-house engineer"
+    title: Spooky-J Tech Rider
+    note: Tech rider, with the venue's in-house engineer
     file: /assets/files/spooky-j-rider-in-house-engineer.pdf
+  - project: Spooky-J
+    title: Spooky-J Tech Rider w/ Sound Engineer
+    note: Tech rider, with my own sound engineer (Hayden Hook)
+    file: /assets/files/spooky-j-rider-with-hayden.pdf
   - project: Nihiloxica
-    title: "Nihiloxica (NO DRUM KIT)"
-    note: "Full rider 2026, venue provides the drum kit"
+    title: Nihiloxica (NO DRUM KIT)
+    note: Full rider 2026, venue provides the drum kit
     file: /assets/files/nihiloxica-rider-2026-drum-kit-provided.pdf
   - project: Nihiloxica
-    title: "Nihiloxica (WITH DRUM KIT)"
-    note: "Full rider 2026, we bring our own drum kit"
+    title: Nihiloxica (WITH DRUM KIT)
+    note: Full rider 2026, we bring our own drum kit
     file: /assets/files/nihiloxica-rider-2026-own-drum-kit.pdf
 photos:
   - project: Spooky-J
     image: /assets/files/spooky-j-album-promo.jpg
-    credit: ""
   - project: Nihiloxica
     image: /assets/files/nihiloxica-1-credit-marco-maezza.jpg
     credit: Marco Maezza
@@ -55,4 +62,4 @@ photos:
   - project: Nihiloxica
     image: /assets/files/nihiloxica-le-guess-who-36framez-3.jpg
     credit: 36framez (Le Guess Who)
-downloads: []
+contact: "Booking and press: use the [contact form](/contact/)."
